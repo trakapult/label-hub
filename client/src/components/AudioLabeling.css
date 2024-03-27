@@ -1,0 +1,29 @@
+.audio-canvas-container {
+  position: relative;
+  margin: 20px auto;
+  height: 240px;
+  overflow-x: scroll;
+}
+
+audio {
+  display: block;
+  margin: 0 auto;
+}
+
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.label-canvas {
+  z-index: 1;
+}
+
+.progress-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: red;
+  z-index: 2;
+}
