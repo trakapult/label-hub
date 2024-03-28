@@ -63,8 +63,8 @@ function TextLabeling() {
   const handleAuxClick = (e) => {
     console.log("aux click", e);
     const newSegments = [...segments];
-    for(let i = newSegments.length - 1; i >= 0; i--) {
-      if(newSegments[i].labelIdx !== null) {
+    for (let i = newSegments.length - 1; i >= 0; i--) {
+      if (newSegments[i].labelIdx !== null) {
         newSegments[i].labelIdx = null;
         break;
       }

@@ -1,7 +1,7 @@
 const colors = ["blue", "coral", "green", "gray", "salmon", "skyblue"];
 
 function toColor(idx, light=false) {
-  if(idx === -1)
+  if (idx === -1)
     return "white";
   return (light ? "light" : "") + colors[idx % colors.length];
 }

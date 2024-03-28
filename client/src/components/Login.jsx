@@ -18,7 +18,7 @@ function Login() {
         setError(res.error);
         return;
       }
-      dispatch({type: "LOGIN"});
+      dispatch({type: "LOGIN", token: res.data.token, user: res.data.user});
       navigate("/");
     } catch (err) {
       setError(err.response.data.error);

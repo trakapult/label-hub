@@ -2,7 +2,6 @@ import { useAuthContext } from "../context/AuthContext";
 
 function Header() {
   const {state, dispatch} = useAuthContext();
-  console.log("header", localStorage.getItem('isLoggedIn'), state.isLoggedIn);
   return (
     <nav className="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
       <div className="container-fluid">
