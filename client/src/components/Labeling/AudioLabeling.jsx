@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import './AudioLabeling.css';
-import audio from '../assets/sample.mp3';
-import LabelingPanel, {toColor} from './LabelingPanel';
+import React, { useState, useRef, useEffect } from "react";
+import "./AudioLabeling.css";
+import audio from "../assets/sample.mp3";
+import LabelingPanel, {toColor} from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 const canvasHeight = 200;
@@ -77,10 +77,10 @@ function AudioLabeling() {
     ctx.lineWidth = 1;
     ctx.strokeRect(start, ctx.lineWidth / 2, end - start, canvasRef.current.height - ctx.lineWidth);
     const textHeight = 20;
-    ctx.font = textHeight + 'px consolas';
-    ctx.fillStyle = 'white';
+    ctx.font = textHeight + "px consolas";
+    ctx.fillStyle = "white";
     const centerX = (start + end) / 2, centerY = canvasRef.current.height / 2;
-    const segmentText = '片段' + (index + 1);
+    const segmentText = "片段" + (index + 1);
     ctx.fillText(segmentText, centerX - ctx.measureText(segmentText).width / 2, centerY - textHeight / 4);
     const labelText = labels[intv.labelIdx];
     ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
@@ -88,7 +88,7 @@ function AudioLabeling() {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     segments.forEach((interval, index) => {
       fill(ctx, interval, index);
@@ -122,8 +122,8 @@ function AudioLabeling() {
       currentSegment.start = currentSegment.end;
       currentSegment.end = temp;
     }
-    console.log('Mouse up, currentSegment:', currentSegment);
-    console.log('converted segments:', convertSegments([...segments, currentSegment]));
+    console.log("Mouse up, currentSegment:", currentSegment);
+    console.log("converted segments:", convertSegments([...segments, currentSegment]));
     if (currentSegment.end - currentSegment.start > 0)
       setSegments([...segments, currentSegment]);
     setCurrentSegment(null);
@@ -153,7 +153,7 @@ function AudioLabeling() {
   const handleMouseOver = () => {
     console.log("mouse over", mouseLeaveInterval);
     if (mouseLeaveInterval) {
-      console.log('clear mouse leave interval');
+      console.log("clear mouse leave interval");
       clearInterval(mouseLeaveInterval);
       mouseLeaveInterval = null;
     }
@@ -184,7 +184,7 @@ function AudioLabeling() {
   return (
     <>
       <LabelingPanel
-        dataType='audio'
+        dataType="audio"
         data={
           <>
             <div

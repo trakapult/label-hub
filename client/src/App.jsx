@@ -1,17 +1,20 @@
-import React from 'react';
-import './App.css';
-import TextLabeling from './components/TextLabeling';
-import ImageLabeling from './components/ImageLabeling';
-import AudioLabeling from './components/AudioLabeling';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Header from "./components/Header";
+import routes from "./routes";
 
 function App() {
   return (
-    <div>
-      <TextLabeling />
-      <ImageLabeling />
-      <AudioLabeling />
-    </div>
+    <>
+      <Header />
+      <Routes>
+        {routes.map((route, index) => (
+          <Route key={index} path={route.path} element={route.element} />
+        ))}
+      </Routes>
+    </>
   );
 }
 

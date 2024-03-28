@@ -1,7 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import './ImageLabeling.css';
-import sampleImage from '../assets/sample.jpg';
-import LabelingPanel, { toColor } from './LabelingPanel';
+import React, { useState, useRef, useEffect } from "react";
+import "./ImageLabeling.css";
+import sampleImage from "../assets/sample.jpg";
+import LabelingPanel, { toColor } from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 const canvasHeight = 450;
@@ -20,17 +20,17 @@ function ImageLabeling() {
     ctx.lineWidth = 1;
     ctx.strokeRect(rect.x, rect.y + ctx.lineWidth / 2, rect.width, rect.height - ctx.lineWidth);
     const textHeight = 20;
-    ctx.font = textHeight + 'px consolas';
-    ctx.fillStyle = 'white';
+    ctx.font = textHeight + "px consolas";
+    ctx.fillStyle = "white";
     const centerX = rect.x + rect.width / 2, centerY = rect.y + rect.height / 2;
-    const areaText = '区域' + (index + 1);
+    const areaText = "区域" + (index + 1);
     ctx.fillText(areaText, centerX - ctx.measureText(areaText).width / 2, centerY - textHeight / 4);
     const labelText = labels[rect.labelIdx];
     ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
   }
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     areas.forEach((rect, index) => {
       fill(ctx, rect, index);
@@ -46,7 +46,7 @@ function ImageLabeling() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setCurrentArea({x, y, labelIdx: 0});
-    console.log('Mouse down, currentArea:', currentArea);
+    console.log("Mouse down, currentArea:", currentArea);
   };
 
   const handleMouseMove = (e) => {
@@ -58,7 +58,7 @@ function ImageLabeling() {
     const width = x - currentArea.x;
     const height = y - currentArea.y;
     setCurrentArea({...currentArea, width, height});
-    console.log('Mouse move, currentArea:', currentArea);
+    console.log("Mouse move, currentArea:", currentArea);
   };
 
   const handleMouseUp = () => {
@@ -86,7 +86,7 @@ function ImageLabeling() {
   const handleLabelChange = (index, event) => {
     const newAreas = [...areas];
     newAreas[index].labelIdx = event.target.value;
-    console.log('Rank change, newAreas:', newAreas);
+    console.log("Rank change, newAreas:", newAreas);
     setAreas(newAreas);
   };
 
@@ -109,7 +109,7 @@ function ImageLabeling() {
     <>
       <h1>Image Labeling</h1>
       <LabelingPanel
-        dataType='image'
+        dataType="image"
         data={
           <div className="image-canvas-container" style={{height: canvasHeight}}>
             <img src={sampleImage} alt="Sample" />

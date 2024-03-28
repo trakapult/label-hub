@@ -1,11 +1,11 @@
-const colors = ['blue', 'coral', 'green', 'gray', 'salmon', 'skyblue'];
+const colors = ["blue", "coral", "green", "gray", "salmon", "skyblue"];
 
 function toColor(idx, light=false) {
   if(idx === -1)
-    return 'white';
-  return (light ? 'light' : '') + colors[idx % colors.length];
+    return "white";
+  return (light ? "light" : "") + colors[idx % colors.length];
 }
-function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height='500px', align=false}) {
+function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height="500px", align=false}) {
   return (
     <div className="container">
       <div className="row">
@@ -31,14 +31,14 @@ function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, 
                     <td>
                       <div className="btn-group" defaultValue={0} onClick={(e) => {
                         e.target.parentElement.childNodes.forEach((button) => {
-                          button.classList.remove('active');
+                          button.classList.remove("active");
                         });
-                        e.target.classList.add('active');
+                        e.target.classList.add("active");
                         handleLabelChange(index, e)
                       }}>
                         {labels.map((label, index) =>
                           <button
-                            className={"btn btn-primary" + (dataType !== 'text' && index === 0 ? " active" : "")}
+                            className={"btn btn-primary" + (dataType !== "text" && index === 0 ? " active" : "")}
                             value={index}
                             key={index}>
                             {label}

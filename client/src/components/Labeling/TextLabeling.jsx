@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import './TextLabeling.css';
-import LabelingPanel, { toColor } from './LabelingPanel';
+import { useState } from "react";
+import "./TextLabeling.css";
+import LabelingPanel, { toColor } from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 
@@ -39,8 +39,8 @@ function TextLabeling() {
   const handleMouseUp = () => {
     const segment = window.getSelection();
     console.log(segment);
-    const startIndex = segment.anchorNode.parentElement.getAttribute('index');
-    const endIndex = segment.focusNode.parentElement.getAttribute('index');
+    const startIndex = segment.anchorNode.parentElement.getAttribute("index");
+    const endIndex = segment.focusNode.parentElement.getAttribute("index");
     let start = sortedSegments[startIndex].start + segment.anchorOffset;
     let end = sortedSegments[endIndex].start + segment.focusOffset;
     console.log(start, end);
@@ -61,7 +61,7 @@ function TextLabeling() {
   };
 
   const handleAuxClick = (e) => {
-    console.log('aux click', e);
+    console.log("aux click", e);
     const newSegments = [...segments];
     for(let i = newSegments.length - 1; i >= 0; i--) {
       if(newSegments[i].labelIdx !== null) {
@@ -80,14 +80,14 @@ function TextLabeling() {
     if (end - start <= 20)
       return text.substring(start, end);
     else
-      return text.substring(start, start + 20) + '...';
+      return text.substring(start, start + 20) + "...";
   }
 
   return (
     <>
       <h1>Text Labeling App</h1>
       <LabelingPanel
-        dataType='text'
+        dataType="text"
         data={
           <p onMouseUp={handleMouseUp} onAuxClick={handleAuxClick} onContextMenu={(e) => e.preventDefault()}>
             {sortedSegments.map((s, index) => (
@@ -95,8 +95,8 @@ function TextLabeling() {
                 index={index}
                 key={index}
                 style={{
-                  backgroundColor: s.labelIdx === null ? 'white' : toColor(s.labelIdx, true),
-                  border: s.labelIdx === null ? '' : '1px solid black'
+                  backgroundColor: s.labelIdx === null ? "white" : toColor(s.labelIdx, true),
+                  border: s.labelIdx === null ? "" : "1px solid black"
                 }}
               >
                 {text.substring(s.start, s.end)}
@@ -107,7 +107,7 @@ function TextLabeling() {
         attrs={["区间", "内容"]}
         rows={
           segments.map((s, index) =>
-            s.labelIdx === null ? null : ['[' + s.start + ', ' + s.end + ')', getContent(index)])
+            s.labelIdx === null ? null : ["[" + s.start + ", " + s.end + ")", getContent(index)])
         }
         labels={labels}
         handleLabelChange={handleLabelChange}
