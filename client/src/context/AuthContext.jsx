@@ -21,18 +21,14 @@ export const AuthProvider = ({children}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   
   useEffect(() => {
-    console.log(localStorage);
     const loggedInState = localStorage.getItem('isLoggedIn');
-    console.log(localStorage, "loggedInState: ", loggedInState);
     if (loggedInState === "true") {
       dispatch({type: 'LOGIN'});
     }
   }, []);
 
   useEffect(() => {
-    console.log("w state.isLoggedIn: ", localStorage.getItem('isLoggedIn'), state.isLoggedIn);
     localStorage.setItem('isLoggedIn', state.isLoggedIn);
-    console.log("x state.isLoggedIn: ", localStorage.getItem('isLoggedIn'), state.isLoggedIn);
   }, [state.isLoggedIn]);
 
   return (

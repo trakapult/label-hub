@@ -38,7 +38,7 @@ function Login() {
             title="登录"
             attrs={[
               {type: "email", label: "邮箱", setter: setEmail},
-              {type: "password", label: "密码", setter: setPassword, message: "密码长度至少为8个字符"}
+              {type: "password", label: "密码", setter: setPassword}
             ]}
             error={error}
             buttonName={"登录"}

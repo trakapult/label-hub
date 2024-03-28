@@ -38,7 +38,7 @@ function Register() {
             title="注册"
             attrs={[
               {type: "email", label: "邮箱", setter: setEmail},
-              {type: "password", label: "密码", setter: setPassword, message: "密码长度至少为8个字符"}
+              {type: "password", label: "密码", setter: setPassword, message: "密码应为8-32个字符，且只能包含字母和数字"}
             ]}
             error={error}
             buttonName={"注册"}
