@@ -25,7 +25,7 @@ module.exports = {
       if (!user) {
         return res.status(403).send({error: "邮箱或密码错误"});
       }
-      const isPasswordValid = password === user.password;
+      const isPasswordValid = await user.comparePassword(password);
       if (!isPasswordValid) {
         return res.status(403).send({error: "邮箱或密码错误"});
       }
