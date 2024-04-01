@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./ImageLabeling.css";
+import "./ImageLabeling.module.css";
 import sampleImage from "../assets/sample.jpg";
 import LabelingPanel, { toColor } from "./LabelingPanel";
 
@@ -12,10 +12,10 @@ function ImageLabeling() {
   const [areas, setAreas] = useState([]);
   const [currentArea, setCurrentArea] = useState(null);
   const fill = (ctx, rect, index) => {
-    ctx.fillStyle = toColor(rect.labelIdx);
+    ctx.fillStyle = toColor(rect.labelId);
     ctx.globalAlpha = 0.5;
     ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
-    ctx.strokeStyle = toColor(rect.labelIdx);
+    ctx.strokeStyle = toColor(rect.labelId);
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
     ctx.strokeRect(rect.x, rect.y + ctx.lineWidth / 2, rect.width, rect.height - ctx.lineWidth);
@@ -25,7 +25,7 @@ function ImageLabeling() {
     const centerX = rect.x + rect.width / 2, centerY = rect.y + rect.height / 2;
     const areaText = "区域" + (index + 1);
     ctx.fillText(areaText, centerX - ctx.measureText(areaText).width / 2, centerY - textHeight / 4);
-    const labelText = labels[rect.labelIdx];
+    const labelText = labels[rect.labelId];
     ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
   }
   useEffect(() => {
@@ -45,7 +45,7 @@ function ImageLabeling() {
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    setCurrentArea({x, y, labelIdx: 0});
+    setCurrentArea({x, y, labelId: 0});
     console.log("Mouse down, currentArea:", currentArea);
   };
 
@@ -85,7 +85,7 @@ function ImageLabeling() {
 
   const handleLabelChange = (index, event) => {
     const newAreas = [...areas];
-    newAreas[index].labelIdx = event.target.value;
+    newAreas[index].labelId = event.target.value;
     console.log("Rank change, newAreas:", newAreas);
     setAreas(newAreas);
   };
@@ -95,12 +95,12 @@ function ImageLabeling() {
   canvasWidth = canvasHeight / image.height * image.width;
   const convertAreas = (areas) => {
     const imageWidth = image.width, imageHeight = image.height;
-    const converted = areas.map(({x, y, width, height, labelIdx}) => ({
+    const converted = areas.map(({x, y, width, height, labelId}) => ({
       x0: x / canvasWidth * imageWidth,
       y0: y / canvasHeight * imageHeight,
       x1: (x + width) / canvasWidth * imageWidth,
       y1: (y + height) / canvasHeight * imageHeight,
-      labelIdx
+      labelId
     }));
     return converted;
   }
@@ -127,7 +127,7 @@ function ImageLabeling() {
           </div>
         }
         attrs={["序号", "左上角", "右下角"]}
-        rows={convertAreas(areas).map(({x0, y0, x1, y1, labelIdx}, index) =>[
+        rows={convertAreas(areas).map(({x0, y0, x1, y1, labelId}, index) =>[
           index + 1,
           `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,
           `(${x1.toFixed(2)}, ${y1.toFixed(2)})`

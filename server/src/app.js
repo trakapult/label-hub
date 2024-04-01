@@ -12,7 +12,7 @@ const app = express();
 app.use(bodyParser.json()); // parses the body of the request
 app.use(cors()); // allows requests from any origin
 // app.use(morgan("combined")) // prints logs to the console
-app.use(morgan("dev")); // prints logs to the console
+// app.use(morgan("dev")); // prints logs to the console
 routes(app);
 
 sequelize.sync()

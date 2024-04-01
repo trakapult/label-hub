@@ -32,7 +32,7 @@ module.exports = {
       const userJson = user.toJSON();
       res.send({user: userJson, token: jwtSignUser(userJson)});
     } catch(err) {
-      console.log(err);
+      console.log("err\n\n\n\n\n\n",err);
       res.status(500).send({error: "登录时发生错误"});
     }
   }

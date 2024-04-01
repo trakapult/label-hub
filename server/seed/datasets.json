@@ -1,0 +1,42 @@
+[
+  {
+    "userId": 1,
+    "name": "Cat or Dog",
+    "description": "A simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorial",
+    "segment": false
+  },
+  {
+    "userId": 2,
+    "name": "Cat or Dog",
+    "description": "A simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorial",
+    "segment": false
+  },
+  {
+    "userId": 3,
+    "name": "Cat or Dog",
+    "description": "A simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorial",
+    "segment": false
+  },
+  {
+    "userId": 4,
+    "name": "Cat or Dog",
+    "description": "A simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorial",
+    "segment": false
+  },
+  {
+    "userId": 5,
+    "name": "Cat or Dog",
+    "description": "A simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorial",
+    "segment": false
+  }
+]

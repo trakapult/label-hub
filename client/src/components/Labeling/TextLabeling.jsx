@@ -1,36 +1,36 @@
 import { useState } from "react";
-import "./TextLabeling.css";
+import "./TextLabeling.module.css";
 import LabelingPanel, { toColor } from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 
 function TextLabeling() {
   const [text, setText] = useState("哇哇哇哇哇哇哇哇哇Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.");
-  const [segments, setSegments] = useState([{ start: 0, end: text.length, labelIdx: null}]);
-  const [sortedSegments, setSortedSegments] = useState([{ start: 0, end: text.length, labelIdx: null}]);
+  const [segments, setSegments] = useState([{ start: 0, end: text.length, labelId: null}]);
+  const [sortedSegments, setSortedSegments] = useState([{ start: 0, end: text.length, labelId: null}]);
 
-  const handleSegments = (start, end, labelIdx) => {
+  const handleSegments = (start, end, labelId) => {
     const newSegments = [];
     for (const s of segments) {
       if (s.start < start && start < s.end) {
-        if (s.labelIdx === labelIdx) {
+        if (s.labelId === labelId) {
           start = s.start;
         } else {
-          newSegments.push({start: s.start, end: start, labelIdx: s.labelIdx});
+          newSegments.push({start: s.start, end: start, labelId: s.labelId});
         }
       }
       if (s.start < end && end < s.end) {
-        if (s.labelIdx === labelIdx) {
+        if (s.labelId === labelId) {
           end = s.end;
         } else {
-          newSegments.push({start: end, end: s.end, labelIdx: s.labelIdx});
+          newSegments.push({start: end, end: s.end, labelId: s.labelId});
         }
       }
       if (end <= s.start || start >= s.end) {
         newSegments.push(s);
       }
     }
-    newSegments.push({start, end, labelIdx});
+    newSegments.push({start, end, labelId});
     console.log(newSegments.length);
     setSegments(newSegments);
     setSortedSegments(newSegments.slice().sort((a, b) => (a.start - b.start)));
@@ -55,17 +55,17 @@ function TextLabeling() {
   };
 
   const handleLabelChange = (index, e) => {
-    const newSegment = {...segments[index], labelIdx: parseInt(e.target.value)};
+    const newSegment = {...segments[index], labelId: parseInt(e.target.value)};
     window.getSelection().removeAllRanges();
-    handleSegments(newSegment.start, newSegment.end, newSegment.labelIdx);
+    handleSegments(newSegment.start, newSegment.end, newSegment.labelId);
   };
 
   const handleAuxClick = (e) => {
     console.log("aux click", e);
     const newSegments = [...segments];
     for (let i = newSegments.length - 1; i >= 0; i--) {
-      if (newSegments[i].labelIdx !== null) {
-        newSegments[i].labelIdx = null;
+      if (newSegments[i].labelId !== null) {
+        newSegments[i].labelId = null;
         break;
       }
     }
@@ -95,8 +95,8 @@ function TextLabeling() {
                 index={index}
                 key={index}
                 style={{
-                  backgroundColor: s.labelIdx === null ? "white" : toColor(s.labelIdx, true),
-                  border: s.labelIdx === null ? "" : "1px solid black"
+                  backgroundColor: s.labelId === null ? "white" : toColor(s.labelId, true),
+                  border: s.labelId === null ? "" : "1px solid black"
                 }}
               >
                 {text.substring(s.start, s.end)}
@@ -107,7 +107,7 @@ function TextLabeling() {
         attrs={["区间", "内容"]}
         rows={
           segments.map((s, index) =>
-            s.labelIdx === null ? null : ["[" + s.start + ", " + s.end + ")", getContent(index)])
+            s.labelId === null ? null : ["[" + s.start + ", " + s.end + ")", getContent(index)])
         }
         labels={labels}
         handleLabelChange={handleLabelChange}

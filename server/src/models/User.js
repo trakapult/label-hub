@@ -21,9 +21,11 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING
   }, {
     hooks: {
-      //beforeCreate: hashPassword,
-      //beforeUpdate: hashPassword,
-      beforeSave: hashPassword
+      // beforeCreate: hashPassword,
+      // beforeUpdate: hashPassword,
+      beforeSave: hashPassword,
+      beforeBulkCreate: (users, options) =>
+        Promise.all(users.map(user => hashPassword(user, options)))
     }
   });
   User.prototype.comparePassword = function (password) {

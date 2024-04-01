@@ -31,13 +31,12 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({children}) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  
   useEffect(() => {
     const loggedInState = localStorage.getItem("isLoggedIn");
     if (loggedInState === "true") {
       dispatch({
         type: "LOGIN",
-        user: localStorage.getItem("user"),
+        user: JSON.parse(localStorage.getItem("user")),
         token: localStorage.getItem("token")
       });
     }
@@ -45,7 +44,7 @@ export const AuthProvider = ({children}) => {
 
   useEffect(() => {
     localStorage.setItem("isLoggedIn", state.isLoggedIn);
-    localStorage.setItem("user", state.user);
+    localStorage.setItem("user", JSON.stringify(state.user));
     localStorage.setItem("token", state.token);
   }, [state]);
 

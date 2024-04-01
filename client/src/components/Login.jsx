@@ -1,18 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import InfoPanel from "./InfoPanel";
 import { useAuthContext } from "../context/AuthContext";
+import UserForm from "./UserForm";
 import AuthService from "../services/AuthService";
 
 function Login() {
   const navigate = useNavigate();
   const {state, dispatch} = useAuthContext();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const login = async () => {
+  const login = async (e) => {
     try {
+      const email = e.target.email.value, password = e.target.password.value;
       const res = await AuthService.login({email, password});
       if (res.error) {
         setError(res.error);
@@ -34,11 +33,11 @@ function Login() {
     <div className="container pt-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
-          <InfoPanel
+          <UserForm
             title="登录"
             attrs={[
-              {type: "email", label: "邮箱", setter: setEmail},
-              {type: "password", label: "密码", setter: setPassword}
+              {type: "email", label: "邮箱"},
+              {type: "password", label: "密码"}
             ]}
             error={error}
             buttonName={"登录"}

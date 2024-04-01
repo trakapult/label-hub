@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./AudioLabeling.css";
+import "./AudioLabeling.module.css";
 import audio from "../assets/sample.mp3";
 import LabelingPanel, {toColor} from "./LabelingPanel";
 
@@ -69,10 +69,10 @@ function AudioLabeling() {
   const [currentSegment, setCurrentSegment] = useState(null);
   const fill = (ctx, intv, index) => {
     const {start, end} = intv;
-    ctx.fillStyle = toColor(intv.labelIdx);
+    ctx.fillStyle = toColor(intv.labelId);
     ctx.globalAlpha = 0.5;
     ctx.fillRect(start, 0, end - start, canvasRef.current.height);
-    ctx.strokeStyle = toColor(intv.labelIdx);
+    ctx.strokeStyle = toColor(intv.labelId);
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
     ctx.strokeRect(start, ctx.lineWidth / 2, end - start, canvasRef.current.height - ctx.lineWidth);
@@ -82,7 +82,7 @@ function AudioLabeling() {
     const centerX = (start + end) / 2, centerY = canvasRef.current.height / 2;
     const segmentText = "片段" + (index + 1);
     ctx.fillText(segmentText, centerX - ctx.measureText(segmentText).width / 2, centerY - textHeight / 4);
-    const labelText = labels[intv.labelIdx];
+    const labelText = labels[intv.labelId];
     ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
   }
 
@@ -101,7 +101,7 @@ function AudioLabeling() {
     if (e.button !== 0) return;
     const canvas = canvasRef.current;
     const x = e.clientX - canvas.getBoundingClientRect().left;
-    setCurrentSegment({start: x, end: x, labelIdx: 0});
+    setCurrentSegment({start: x, end: x, labelId: 0});
   }
 
   const handleMouseMove = (e) => {
@@ -168,15 +168,15 @@ function AudioLabeling() {
 
   const handleLabelChange = (index, event) => {
     const newSegments = [...segments];
-    newSegments[index].labelIdx = parseInt(event.target.value);
+    newSegments[index].labelId = parseInt(event.target.value);
     setSegments(newSegments);
   };
 
   const convertSegments = (segments) => {
-    const converted = segments.map(({start, end, labelIdx}) => ({
+    const converted = segments.map(({start, end, labelId}) => ({
       start: Math.max(0, (start - margin) / waveRef.current.width) * audioRef.current.duration,
       end: Math.min(1, (end - margin) / waveRef.current.width) * audioRef.current.duration,
-      labelIdx
+      labelId
     }));
     return converted;
   }
