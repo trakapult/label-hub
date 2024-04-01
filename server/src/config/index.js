@@ -1,5 +1,5 @@
 const path = require("path");
-const projectName = "label-hub"
+const projectName = "label-hub";
 
 module.exports = {
   port: process.env.PORT || 5174,

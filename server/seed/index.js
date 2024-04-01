@@ -14,10 +14,10 @@ async function seed () {
     fs.rmSync("./data", {recursive: true});
   }
   fs.mkdirSync("./data");
-  if (fs.existsSync("./update")) {
-    fs.rmSync("./update", {recursive: true});
+  if (fs.existsSync("./uploads")) {
+    fs.rmSync("./uploads", {recursive: true});
   }
-  fs.mkdirSync("./update");
+  fs.mkdirSync("./uploads");
   fs.readdirSync("./seed/data").forEach(file => {
     fs.copyFileSync(`./seed/data/${file}`, `./data/${file}`);
   });

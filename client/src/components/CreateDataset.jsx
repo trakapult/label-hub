@@ -11,10 +11,6 @@ function CreateDataset() {
 
   const submit = async (e) => {
     try {
-      if (!state.isLoggedIn) {
-        setError("请先登录或注册");
-        return;
-      }
       const userId = state.user.id;
       const name = e.target.name.value, description = e.target.description.value;
       const dataType = e.target.dataType.value, labelType = e.target.labelType.value;
