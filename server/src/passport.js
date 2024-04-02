@@ -12,12 +12,14 @@ passport.use(
     secretOrKey: config.auth.jwtSecret
   },
   async function (jwtPayload, done) {
+    console.log("wwwww");
+    return done(false, true);
     try {
       const user = await User.findOne({where: {id: jwtPayload.id}});
       if (!user) {
         return done(new Error(), false);
       }
-      return done(null, user);
+      return done(null, user.toJSON());
     } catch (err) {
       return done(new Error(), false);
     }

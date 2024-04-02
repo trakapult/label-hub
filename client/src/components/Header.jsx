@@ -16,7 +16,7 @@ function Header() {
         )}
         {state.isLoggedIn && (
           <div className="navbar-nav">
-            <a className="nav-link" href="/profile">个人信息</a>
+            <a className="nav-link" href={`/user/${state.user.id}`}>个人信息</a>
             <a className="nav-link" href="/" onClick={() => dispatch({type: "LOGOUT"})}>注销</a>
           </div>
         )}

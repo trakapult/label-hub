@@ -15,7 +15,14 @@ module.exports = {
       res.send({user: userJson, token: jwtSignUser(userJson)});
     } catch(err) {
       console.log(err);
-      res.status(400).send({error: "邮箱已有人使用"});
+      // check if the error is due to a duplicate email or a duplicate username
+      if (err.errors[0].message === "name must be unique") {
+        res.status(400).send({error: "用户名已被注册"});
+      } else if (err.errors[0].message === "email must be unique") {
+        res.status(400).send({error: "邮箱已被注册"});
+      } else {
+        res.status(400).send({error: "注册时发生错误"});
+      }
     }
   },
   async login (req, res) {

@@ -32,6 +32,7 @@ module.exports = {
     }
   },
   async show (req, res) {
+    console.log("showing");
     try {
       const dataset = await Dataset.findByPk(req.params.datasetId);
       console.log(req.params.datasetId, dataset);

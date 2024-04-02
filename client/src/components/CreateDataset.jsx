@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import DatasetService from "../services/DatasetService";
 import "./CreateDataset.module.css";
 
 function CreateDataset() {
-  const navigate = useNavigate();
-  const {state, dispatch} = useAuthContext();
+  const {state} = useAuthContext();
   const [error, setError] = useState("");
 
   const submit = async (e) => {
@@ -24,7 +22,7 @@ function CreateDataset() {
       formData.append("labelType", labelType);
       formData.append("segment", segment);
       formData.append("file", file);
-      const res = await DatasetService.post(formData);
+      const res = await DatasetService.post(token, formData);
       if (res.error) {
         setError(res.error);
         return;

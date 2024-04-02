@@ -1,13 +1,13 @@
 import Api from "./Api";
 
 export default {
-  post (dataset) {
-    return Api().post("datasets", dataset);
+  post (token, dataset) {
+    return Api(token).post("datasets", dataset);
   },
-  getAll () {
-    return Api().get("datasets");
+  getAll (token) {
+    return Api(token).get("datasets");
   },
-  get (datasetId) {
-    return Api().get("datasets/" + datasetId);
+  get (token, datasetId) {
+    return Api(token).get("dataset/" + datasetId);
   }
 }

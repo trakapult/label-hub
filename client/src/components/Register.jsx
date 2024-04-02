@@ -11,8 +11,10 @@ function Register() {
 
   const register = async (e) => {
     try {
-      const email = e.target.email.value, password = e.target.password.value;
-      const res = await AuthService.register({email, password});
+      const name = e.target.name.value;
+      const email = e.target.email.value;
+      const password = e.target.password.value;
+      const res = await AuthService.register({name, email, password});
       if (res.error) {
         setError(res.error);
         return;
@@ -36,7 +38,8 @@ function Register() {
           <UserForm
             title="注册"
             attrs={[
-              {type: "email", label: "邮箱"},
+              {type: "name", label: "用户名", message: "用户名应为3-16个字符，且只能包含字母和数字"},
+              {type: "email", label: "邮箱", message: "请输入有效的邮箱地址"},
               {type: "password", label: "密码", message: "密码应为8-32个字符，且只能包含字母和数字"}
             ]}
             error={error}
