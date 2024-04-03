@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
-import "./ImageLabeling.module.css";
-import sampleImage from "../assets/sample.jpg";
+import "./ImageLabeling.css";
+import sampleImage from "../../assets/sample.jpg";
 import LabelingPanel, { toColor } from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];

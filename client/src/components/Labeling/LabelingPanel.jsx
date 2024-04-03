@@ -29,7 +29,7 @@ function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, 
                   <tr key={index}>
                     {row.map((value, index) => <td key={index}>{value}</td>)}
                     <td>
-                      <div className="btn-group" defaultValue={0} onClick={(e) => {
+                      <div className="btn-group btn-group-sm" defaultValue={0} onClick={(e) => {
                         e.target.parentElement.childNodes.forEach((button) => {
                           button.classList.remove("active");
                         });

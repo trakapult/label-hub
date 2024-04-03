@@ -1,32 +1,36 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
 import DatasetService from "../services/DatasetService";
-import "./CreateDataset.module.css";
 
 function CreateDataset() {
   const {state} = useAuthContext();
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const submit = async (e) => {
     try {
-      const userId = state.user.id;
-      const name = e.target.name.value, description = e.target.description.value;
-      const dataType = e.target.dataType.value, labelType = e.target.labelType.value;
-      const segment = e.target.segment.checked;
+      const name = e.target.name.value;
+      const description = e.target.description.value;
+      const admin = state.user.name;
+      const dataType = e.target.dataType.value;
+      const labelType = e.target.labelType.value;
+      const segments = e.target.segments.checked;
       const file = e.target.samples.files[0];
       const formData = new FormData();
-      formData.append("userId", userId);
       formData.append("name", name);
       formData.append("description", description);
+      formData.append("admin", admin);
       formData.append("dataType", dataType);
       formData.append("labelType", labelType);
-      formData.append("segment", segment);
+      formData.append("segments", segments);
       formData.append("file", file);
-      const res = await DatasetService.post(token, formData);
+      const res = await DatasetService.post(state.token, formData);
       if (res.error) {
         setError(res.error);
         return;
       }
+      navigate("/dataset/" + res.data.id);
     } catch (err) {
       console.log(err);
       setError(err.response.data.error);
@@ -46,7 +50,7 @@ function CreateDataset() {
               </div>
               <div className="input-group mb-3">
                 <span className="input-group-text">描述</span>
-                <textarea className="form-control" id="description" required></textarea>
+                <textarea className="form-control" id="description" required />
               </div>
               <div className="row align-items-center mb-3">
                 <div className="col-md-4">
@@ -62,13 +66,13 @@ function CreateDataset() {
                     <option value="">选择标注类型</option>
                     <option value="numerical">数值</option>
                     <option value="categorical">分类</option>
-                    <option value="text">文本</option>
+                    <option value="textual">文本</option>
                   </select>
                 </div>
                 <div className="col-md-4">
                   <div className="form-check form-switch">
-                    <input className="form-check-input" type="checkbox" id="segment" />
-                    <label className="form-check-label" htmlFor="segment">分段标注</label>
+                    <input className="form-check-input" type="checkbox" id="segments" />
+                    <label className="form-check-label" htmlFor="segments">分段标注</label>
                   </div>
                 </div>
               </div>

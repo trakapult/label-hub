@@ -2,20 +2,24 @@ import View from "./View";
 import UserService from "../services/UserService";
 
 function ViewUser () {
-  const userId = window.location.pathname.split("/")[2];
-  const handleChange = (user) => {
+  const userName = window.location.pathname.split("/")[2];
+  const handleLoad = (user) => {
     return (
-      <div className="card pt-4 pb-4">
-        <div className="card-body">
-          <h2 className="card-title mb-5">{user.name}</h2>
-          <div>email: {user.email}</div>
+      user && (
+        <div className="card pt-4 pb-4">
+          <div className="card-body">
+            <h2 className="card-title mb-5">{user.name}</h2>
+            <div>email: {user.email}</div>
+          </div>
         </div>
-      </div>
+      )
     );
   }
 
   return (
-    <View service={UserService.get} args={[userId]} handleChange={handleChange} />
+    <div className="container pt-5">
+      <View service={UserService.get} params={[userName]} handleLoad={handleLoad} />
+    </div>
   );
 }
 

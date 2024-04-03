@@ -12,8 +12,6 @@ passport.use(
     secretOrKey: config.auth.jwtSecret
   },
   async function (jwtPayload, done) {
-    console.log("wwwww");
-    return done(false, true);
     try {
       const user = await User.findOne({where: {id: jwtPayload.id}});
       if (!user) {

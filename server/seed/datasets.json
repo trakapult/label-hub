@@ -1,42 +1,50 @@
 [
   {
-    "userId": 1,
-    "name": "Cat or Dog",
+    "name": "Cat or Dog 1",
+    "admin": "abc",
     "description": "A simple example of a binary classification task",
     "dataType": "image",
-    "labelType": "categorial",
-    "segment": false
+    "labelType": "categorical",
+    "segments": false
   },
   {
-    "userId": 2,
-    "name": "Cat or Dog",
-    "description": "A simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorial",
-    "segment": false
+    "name": "Cat or Dog 2",
+    "admin": "ABC",
+    "description": "Another simple example of a binary classification task\nAnother simple example of a binary classification task\nAnother simple example of a binary classification task",
+    "dataType": "text",
+    "labelType": "numerical",
+    "segments": true
   },
   {
-    "userId": 3,
-    "name": "Cat or Dog",
-    "description": "A simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorial",
-    "segment": false
+    "name": "Cat or Dog 3",
+    "admin": "ABC",
+    "description": "测试中文字符",
+    "dataType": "audio",
+    "labelType": "textual",
+    "segments": false
   },
   {
-    "userId": 4,
-    "name": "Cat or Dog",
-    "description": "A simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorial",
-    "segment": false
+    "name": "Cat or Dog 4",
+    "admin": "abc",
+    "description": "Yet another simple example of a binary classification task",
+    "dataType": "text",
+    "labelType": "categorical",
+    "segments": false
   },
   {
-    "userId": 5,
-    "name": "Cat or Dog",
-    "description": "A simple example of a binary classification task",
+    "name": "Cat or Dog 5",
+    "admin": "abc",
+    "description": "Yet another simple example of a binary classification task",
     "dataType": "image",
-    "labelType": "categorial",
-    "segment": false
+    "labelType": "categorical",
+    "segments": false
+  },
+  {
+    "name": "Cat or Dog 6",
+    "admin": "abc",
+    "description": "Yet another simple example of a binary classification task",
+    "dataType": "image",
+    "labelType": "categorical",
+    "segments": false
   }
 ]

@@ -11,7 +11,7 @@ const IsAuthenticated = require("./policies/IsAuthenticated");
 module.exports = (app) => {
   app.post("/register", AuthControllerPolicy.register, AuthController.register),
   app.post("/login", AuthController.login),
-  app.get("/user/:userId", IsAuthenticated, UserController.show),
+  app.get("/user/:userName", IsAuthenticated, UserController.show),
   app.post("/datasets", [upload.single("file"), IsAuthenticated, DatasetControllerPolicy.create], DatasetController.create),
   app.get("/datasets", IsAuthenticated, DatasetController.index),
   app.get("/dataset/:datasetId", IsAuthenticated, DatasetController.show)

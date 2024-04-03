@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from "../context/AuthContext";
 
-function View ({service, args, handleChange}) {
+function View ({service, params, handleLoad}) {
   const [content, setContent] = useState(null);
   const [error, setError] = useState("");
   const {state} = useAuthContext();
 
   const get = async () => {
     try {
-      const res = await service(state.token, ...args);
+      console.log(...params);
+      const res = await service(state.token, ...params);
       if (res.error) {
         setError(res.error);
         return;
@@ -25,9 +26,8 @@ function View ({service, args, handleChange}) {
     if (state.isLoggedIn) {
       get();
     }
-  }, [state]);
+  }, [state, params]);
 
-  // if loading spinner spins for 10 seconds, show error message
   useEffect(() => {
     const timer = setTimeout(() => {
       if (content) {
@@ -51,10 +51,10 @@ function View ({service, args, handleChange}) {
   );
 
   return (
-    <div className="container pt-5">
-      {content === null && error === "" ? loading : handleChange(content)}
+    <>
+      {content === null && error === "" ? loading : handleLoad(content)}
       {error && <div className="alert alert-danger">{error}</div>}
-    </div>
+    </>
   );
 }
 

@@ -1,15 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
   const Dataset = sequelize.define("Dataset", {
-    userId: DataTypes.INTEGER,
     name: DataTypes.STRING,
+    admin: DataTypes.STRING,
     description: DataTypes.STRING,
     dataType: DataTypes.STRING,
     labelType: DataTypes.STRING,
-    segment: DataTypes.BOOLEAN
+    segments: DataTypes.BOOLEAN
   }, {
     uniqueKeys: {
       dataset_unique: {
-        fields: ["userId", "name"]
+        fields: ["name", "admin"]
       }
     }
   });

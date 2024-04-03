@@ -11,8 +11,7 @@ module.exports = {
   async register (req, res) {
     try {
       const user = await User.create(req.body); // throws an error if there is a duplicate email, since we the email field is set to unique
-      const userJson = user.toJSON();
-      res.send({user: userJson, token: jwtSignUser(userJson)});
+      res.send({user, token: jwtSignUser(user.toJSON())});
     } catch(err) {
       console.log(err);
       // check if the error is due to a duplicate email or a duplicate username
@@ -36,8 +35,7 @@ module.exports = {
       if (!isPasswordValid) {
         return res.status(403).send({error: "邮箱或密码错误"});
       }
-      const userJson = user.toJSON();
-      res.send({user: userJson, token: jwtSignUser(userJson)});
+      res.send({user, token: jwtSignUser(user.toJSON())});
     } catch(err) {
       console.log("err\n\n\n\n\n\n",err);
       res.status(500).send({error: "登录时发生错误"});

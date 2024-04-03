@@ -3,7 +3,7 @@ const { User } = require('../models');
 module.exports = {
   async show (req, res) {
     try {
-      const user = await User.findByPk(req.params.userId);
+      const user = await User.findOne({where: {name: req.params.userName}});
       res.send(user);
     } catch(err) {
       console.log(err);
