@@ -1,6 +1,6 @@
-import TextLabeling from "./Labeling/TextLabeling";
-import ImageLabeling from "./Labeling/ImageLabeling";
-import AudioLabeling from "./Labeling/AudioLabeling";
+import TextLabeling from "../labeling/TextLabeling";
+import ImageLabeling from "../labeling/ImageLabeling";
+import AudioLabeling from "../labeling/AudioLabeling";
 
 function Home() {
     return (

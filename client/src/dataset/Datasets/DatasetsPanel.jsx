@@ -1,5 +1,5 @@
-import View from "../View";
-import DatasetService from "../../services/DatasetService";
+import View from "../../view/View";
+import DatasetService from "../DatasetService";
 import dataText from "../../assets/icons/data_text.png";
 import dataImage from "../../assets/icons/data_image.png";
 import dataAudio from "../../assets/icons/data_audio.png";
@@ -27,7 +27,7 @@ function DatasetsPanel ({search, selections}) {
                     <a className="badge bg-secondary mb-2 text-decoration-none" href={`/user/${dataset.admin}`}>@{dataset.admin}</a>
                     <p className="card-text">{dataset.description}</p>
                     <div className="d-flex justify-content-center mb-3 gap-2">
-                      {dataset.dataType === "text" && <img src={dataText} alt="text" className="icon" />}
+                      {dataset.dataType === "text" && <img  className="icon" src={dataText} alt="text" />}
                       {dataset.dataType === "image" && <img src={dataImage} alt="image" className="icon" />}
                       {dataset.dataType === "audio" && <img src={dataAudio} alt="audio" className="icon" />}
                       {dataset.labelType === "numerical" && <img src={labelNumerical} alt="numerical" className="icon" />}

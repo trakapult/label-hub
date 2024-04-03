@@ -1,6 +1,6 @@
-import View from "./View";
+import View from "../view/View";
 import DatasetPanel from "./DatasetPanel";
-import DatasetService from "../services/DatasetService";
+import DatasetService from "./DatasetService";
 
 function ViewDataset () {
   const datasetId = window.location.pathname.split("/")[2];

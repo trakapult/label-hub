@@ -5,6 +5,7 @@ function toColor(idx, light=false) {
     return "white";
   return (light ? "light" : "") + colors[idx % colors.length];
 }
+
 function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height="500px", align=false}) {
   return (
     <div className="container">
@@ -42,8 +43,8 @@ function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, 
                             value={index}
                             key={index}>
                             {label}
-                          </button>)
-                        }
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -58,4 +59,4 @@ function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, 
 }
 
 export default LabelingPanel;
-export {toColor};
+export { toColor };

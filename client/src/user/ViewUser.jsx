@@ -1,5 +1,5 @@
-import View from "./View";
-import UserService from "../services/UserService";
+import View from "../view/View";
+import UserService from "./UserService";
 
 function ViewUser () {
   const userName = window.location.pathname.split("/")[2];

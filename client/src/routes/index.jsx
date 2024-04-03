@@ -1,10 +1,10 @@
-import Home from "./components/Home";
-import Login from "./components/Login";
-import Register from "./components/Register";
-import ViewUser from "./components/ViewUser";
-import CreateDataset from "./components/CreateDataset";
-import Datasets from "./components/Datasets";
-import ViewDataset from "./components/ViewDataset";
+import Home from "../home/Home";
+import Login from "../user/Login";
+import Register from "../user/Register";
+import ViewUser from "../user/ViewUser";
+import CreateDataset from "../dataset/CreateDataset";
+import Datasets from "../dataset/Datasets";
+import ViewDataset from "../dataset/ViewDataset";
 
 const routes = [
   {path: "/", name: "Home", element: <Home />},

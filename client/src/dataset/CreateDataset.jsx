@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "../context/AuthContext";
-import DatasetService from "../services/DatasetService";
+import DatasetService from "./DatasetService";
 
 function CreateDataset() {
   const {state} = useAuthContext();

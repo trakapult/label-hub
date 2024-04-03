@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./AudioLabeling.css";
-import audio from "../../assets/sample.mp3";
+import audio from "../assets/sample.mp3";
 import LabelingPanel, {toColor} from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];

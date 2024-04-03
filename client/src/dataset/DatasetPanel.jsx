@@ -7,7 +7,13 @@ function DatasetPanel ({dataset}) {
         <h2 className="card-title mb-3">{dataset.name}</h2>
         <div className="input-group mb-3">
           <span className="input-group-text">描述</span>
-          <textarea className="form-control" id="description" value={dataset.description} readOnly />
+          <textarea
+            className="form-control"
+            id="description"
+            value={dataset.description}
+            style={{height: "150px", resize: "none"}}
+            readOnly
+          />
         </div>
         <div className="row align-items-center mb-3">
           <div className="col-md-4">

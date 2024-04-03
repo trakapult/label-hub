@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserForm from "./UserForm";
 import { useAuthContext } from "../context/AuthContext";
-import AuthService from "../services/AuthService";
+import AuthService from "./AuthService";
 
 function Register() {
   const navigate = useNavigate();
