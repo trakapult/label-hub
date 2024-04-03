@@ -13,7 +13,6 @@ module.exports = {
       const user = await User.create(req.body); // throws an error if there is a duplicate email, since we the email field is set to unique
       res.send({user, token: jwtSignUser(user.toJSON())});
     } catch(err) {
-      console.log(err);
       // check if the error is due to a duplicate email or a duplicate username
       if (err.errors[0].message === "name must be unique") {
         res.status(400).send({error: "用户名已被注册"});
@@ -37,7 +36,6 @@ module.exports = {
       }
       res.send({user, token: jwtSignUser(user.toJSON())});
     } catch(err) {
-      console.log("err\n\n\n\n\n\n",err);
       res.status(500).send({error: "登录时发生错误"});
     }
   }

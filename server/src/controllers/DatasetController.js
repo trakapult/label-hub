@@ -1,6 +1,7 @@
 const { Dataset } = require("../models");
 const { Op }  = require("sequelize");
 const fs = require("fs");
+const admZip = require("adm-zip");
 
 module.exports = {
   async create (req, res) {
@@ -62,6 +63,28 @@ module.exports = {
     } catch(err) {
       console.log(err);
       res.status(400).send({error: "获取数据集时发生错误"});
+    }
+  },
+  async sendFile (req, res) {
+    try {
+      const dataset = await Dataset.findByPk(req.params.datasetId);
+      const path = `./data/${dataset.id}`;
+      if (!fs.existsSync(path)) {
+        const zipFile = new admZip(fs.readFileSync(path + ".zip"));
+        const zipEntries = zipFile.getEntries();
+        // recursively retrieve files from the zip and rename them to their index
+        zipEntries.forEach((zipEntry, index) => {
+          zipFile.extractEntryTo(zipEntry.entryName, path, false, true);
+          fs.renameSync(`${path}/${zipEntry.entryName}`, `${path}/${index}`);
+        });
+      }
+      // read binary file and send it
+      const file = fs.readFileSync(`${path}/${req.params.sampleId}`, "binary");
+      console.log(file.length);
+      res.send(file);
+    } catch(err) {
+      console.log(err);
+      res.status(400).send({error: "获取数据集文件时发生错误"});
     }
   }
 };

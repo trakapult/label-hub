@@ -18,31 +18,35 @@ function DatasetsPanel ({search, selections}) {
 
     return (
       <div className="row">
-          {subsets.map((subset, index) => (
-            <div className="col-md-4" key={index}>
-              {subset.map((dataset) => (
-                <div className="card text-center mb-4" key={dataset.id}>
-                  <div className="card-body">
-                    <h3 className="card-title">{dataset.name}</h3>
-                    <a className="badge bg-secondary mb-2 text-decoration-none" href={`/user/${dataset.admin}`}>@{dataset.admin}</a>
-                    <p className="card-text">{dataset.description}</p>
-                    <div className="d-flex justify-content-center mb-3 gap-2">
-                      {dataset.dataType === "text" && <img  className="icon" src={dataText} alt="text" />}
-                      {dataset.dataType === "image" && <img src={dataImage} alt="image" className="icon" />}
-                      {dataset.dataType === "audio" && <img src={dataAudio} alt="audio" className="icon" />}
-                      {dataset.labelType === "numerical" && <img src={labelNumerical} alt="numerical" className="icon" />}
-                      {dataset.labelType === "categorical" && <img src={labelCategorical} alt="categorical" className="icon" />}
-                      {dataset.labelType === "textual" && <img src={labelTextual} alt="textual" className="icon" />}
-                      {dataset.segments && <img src={segmentsTrue} alt="segmentsTrue" className="icon" />}
-                      {!dataset.segments && <img src={segmentsFalse} alt="segmentsFalse" className="icon" />}
+        {subsets.map((subset, index) => (
+          <div className="col-md-4" key={index}>
+            {subset.map((dataset) => (
+              <div className="card text-center mb-4" key={dataset.id}>
+                <div className="card-body">
+                  <h3 className="card-title">{dataset.name}</h3>
+                  <a className="badge bg-secondary mb-2 text-decoration-none" href={`/user/${dataset.admin}`}>@{dataset.admin}</a>
+                  <p className="card-text">{dataset.description}</p>
+                  <div className="row justify-content-center">
+                    <div className="col-md-4">
+                      <div className="d-flex justify-content-center mb-3 gap-2">
+                        {dataset.dataType === "text" && <img  className="icon" src={dataText} alt="text" />}
+                        {dataset.dataType === "image" && <img className="icon" src={dataImage} alt="image" />}
+                        {dataset.dataType === "audio" && <img className="icon" src={dataAudio} alt="audio" />}
+                        {dataset.labelType === "numerical" && <img className="icon" src={labelNumerical} alt="numerical" />}
+                        {dataset.labelType === "categorical" && <img className="icon" src={labelCategorical} alt="categorical" />}
+                        {dataset.labelType === "textual" && <img className="icon" src={labelTextual} alt="textual" />}
+                        {dataset.segments && <img className="icon" src={segmentsTrue} alt="segmentsTrue" />}
+                        {!dataset.segments && <img className="icon" src={segmentsFalse} alt="segmentsFalse" />}
+                      </div>
                     </div>
-                    <a className="btn btn-primary" href={`/dataset/${dataset.id}`}>查看</a>
                   </div>
+                  <a className="btn btn-primary" href={`/dataset/${dataset.id}`}>查看</a>
                 </div>
-              ))}
-            </div>
-          ))}
-        </div>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
     )
   };
 

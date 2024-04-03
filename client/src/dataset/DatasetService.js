@@ -9,6 +9,9 @@ export default {
     return api(token).get(`datasets?search=${search}&dataType=${dataType}&labelType=${labelType}&segments=${segments}`);
   },
   get (token, datasetId) {
-    return api(token).get("dataset/" + datasetId);
+    return api(token).get(`dataset/${datasetId}`);
+  },
+  getFile (token, datasetId, sampleId) {
+    return api(token).get(`file/${datasetId}/${sampleId}`);
   }
 }

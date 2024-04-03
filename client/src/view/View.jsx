@@ -14,6 +14,7 @@ function View ({service, params, handleLoad}) {
         setError(res.error);
         return;
       }
+      console.log(res.data.length);
       setContent(res.data);
       setError("");
     } catch (err) {
@@ -35,7 +36,7 @@ function View ({service, params, handleLoad}) {
       }
       if (!state.isLoggedIn) {
         setError("请先注册或登录");
-      } else {
+      } else if (error !== "") {
         setError("加载时出现错误");
       }
     }, 1000);
@@ -43,7 +44,7 @@ function View ({service, params, handleLoad}) {
   }, [content]);
 
   const loading = (
-    <div className="d-flex justify-content-center">
+    <div className="d-flex justify-content-center mb-3">
       <div className="spinner-border text-primary" role="status">
         <span className="visually-hidden">Loading...</span>
       </div>
@@ -52,8 +53,8 @@ function View ({service, params, handleLoad}) {
 
   return (
     <>
-      {content === null && error === "" ? loading : handleLoad(content)}
-      {error && <div className="alert alert-danger">{error}</div>}
+      {content === null ? loading : handleLoad(content)}
+      {error && <div className="alert alert-danger text-center">{error}</div>}
     </>
   );
 }

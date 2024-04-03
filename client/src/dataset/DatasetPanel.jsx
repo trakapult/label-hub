@@ -1,6 +1,22 @@
+import View from "../view/View";
+import DatasetService from "./DatasetService";
+import "./DatasetPanel.css";
+import sample from "../assets/icons/original/label_textual.png";
+
+const height = "200px";
+
 function DatasetPanel ({dataset}) {
   const dataTypes = [["text", "文本"], ["image", "图像"], ["audio", "音频"]];
   const labelTypes = [["numerical", "数值"], ["categorical", "分类"], ["textual", "文本"]];
+
+  const handleLoad = (file) => {
+    const url = btoa(file);
+    return (
+      //<img src={`data:image;base64,${url}`} alt="sample" />
+      <img src={sample} alt="sample" />
+    );
+  }
+
   return (
     <div className="card pt-4 pb-4">
       <form className="card-body">
@@ -48,6 +64,15 @@ function DatasetPanel ({dataset}) {
             <div className="form-check form-switch">
               <input className="form-check-input" type="checkbox" id="segments" checked={dataset.segments} readOnly />
               <label className="form-check-label" htmlFor="segments">分段标注</label>
+            </div>
+          </div>
+        </div>
+        样本示例：
+        <br />
+        <div className="row justify-content-center">
+          <div className="col-md-6 border rounded overflow-auto" style={{height: height}}>
+            <div className="img-container">
+              <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleLoad} />
             </div>
           </div>
         </div>

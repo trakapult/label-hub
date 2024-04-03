@@ -10,7 +10,7 @@ audio {
   margin: 0 auto;
 }
 
-canvas {
+.audio-canvas {
   position: absolute;
   top: 0;
   left: 0;

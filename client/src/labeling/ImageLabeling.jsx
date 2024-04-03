@@ -4,32 +4,51 @@ import sampleImage from "../assets/sample.jpg";
 import LabelingPanel, { toColor } from "./LabelingPanel";
 
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
-const canvasHeight = 450;
-let canvasWidth = 0;
+
+const image = new Image();
+image.src = sampleImage;
 
 function ImageLabeling() {
   const canvasRef = useRef(null);
+  const [canvas, setCanvas] = useState(null);
   const [areas, setAreas] = useState([]);
   const [currentArea, setCurrentArea] = useState(null);
+
+  useEffect(() => {
+    canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
+    canvasRef.current.height = canvasRef.current.getBoundingClientRect().height;
+    setCanvas(canvasRef.current);
+  }, [canvasRef]);
+
   const fill = (ctx, rect, index) => {
+    const canvasWidth = canvas.getBoundingClientRect().width;
+    const canvasHeight = canvas.getBoundingClientRect().height;
+    const x = rect.x / canvasWidth * canvas.width;
+    const y = rect.y / canvasHeight * canvas.height;
+    const width = rect.width / canvasWidth * canvas.width;
+    const height = rect.height / canvasHeight * canvas.height;
+    console.log(canvasWidth, canvasHeight, canvas.width, canvas.height);
     ctx.fillStyle = toColor(rect.labelId);
     ctx.globalAlpha = 0.5;
-    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    ctx.fillRect(x, y, width, height);
     ctx.strokeStyle = toColor(rect.labelId);
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
-    ctx.strokeRect(rect.x, rect.y + ctx.lineWidth / 2, rect.width, rect.height - ctx.lineWidth);
-    const textHeight = 20;
+    ctx.strokeRect(x, y + ctx.lineWidth / 2, width, height - ctx.lineWidth);
+    const textHeight = 20 / canvasWidth * canvas.width;
     ctx.font = textHeight + "px consolas";
     ctx.fillStyle = "white";
-    const centerX = rect.x + rect.width / 2, centerY = rect.y + rect.height / 2;
+    const centerX = x + width / 2, centerY = y + height / 2;
     const areaText = "区域" + (index + 1);
-    ctx.fillText(areaText, centerX - ctx.measureText(areaText).width / 2, centerY - textHeight / 4);
+    const areaTextWidth = ctx.measureText(areaText).width;
+    ctx.fillText(areaText, centerX - areaTextWidth / 2, centerY - textHeight / 4);
     const labelText = labels[rect.labelId];
-    ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
+    const labelTextWidth = ctx.measureText(labelText).width;
+    ctx.fillText(labelText, centerX - labelTextWidth / 2, centerY + textHeight * 3 / 4);
   }
+
   useEffect(() => {
-    const canvas = canvasRef.current;
+    if (!canvas || !areas) return;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     areas.forEach((rect, index) => {
@@ -37,21 +56,20 @@ function ImageLabeling() {
     });
     if (currentArea !== null)
       fill(ctx, currentArea, areas.length);
-  }, [areas, currentArea]);
+  }, [canvas, areas, currentArea]);
 
   const handleMouseDown = (e) => {
     if (e.button !== 0) return;
-    const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setCurrentArea({x, y, labelId: 0});
-    console.log("Mouse down, currentArea:", currentArea);
+    console.log("Mouse down, currentArea:", {x, y, labelId: 0});
   };
 
   const handleMouseMove = (e) => {
     if (!currentArea) return;
-    const canvas = canvasRef.current;
+    console.log("mouse move");
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -62,6 +80,7 @@ function ImageLabeling() {
   };
 
   const handleMouseUp = () => {
+    console.log("Mouse up, currentArea:", currentArea);
     if (!currentArea) return;
     if (currentArea.width < 0) {
       currentArea.x += currentArea.width;
@@ -90,11 +109,11 @@ function ImageLabeling() {
     setAreas(newAreas);
   };
 
-  const image = new Image();
-  image.src = sampleImage;
-  canvasWidth = canvasHeight / image.height * image.width;
   const convertAreas = (areas) => {
     const imageWidth = image.width, imageHeight = image.height;
+    if (!canvas) return [];
+    const rect = canvas.getBoundingClientRect();
+    const canvasWidth = rect.width, canvasHeight = rect.height;
     const converted = areas.map(({x, y, width, height, labelId}) => ({
       x0: x / canvasWidth * imageWidth,
       y0: y / canvasHeight * imageHeight,
@@ -102,6 +121,7 @@ function ImageLabeling() {
       y1: (y + height) / canvasHeight * imageHeight,
       labelId
     }));
+    console.log("converted", converted);
     return converted;
   }
 
@@ -111,12 +131,11 @@ function ImageLabeling() {
       <LabelingPanel
         dataType="image"
         data={
-          <div className="image-canvas-container" style={{height: canvasHeight}}>
-            <img src={sampleImage} alt="Sample" />
+          <div className="img-container">
+            <img src={sampleImage} alt="sample" />
             <canvas
+              className="img-canvas"
               ref={canvasRef}
-              width={canvasWidth}
-              height={canvasHeight}
               onMouseDown={handleMouseDown}
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}

@@ -192,7 +192,7 @@ function AudioLabeling() {
               ref={containerRef}
               onMouseDown={() => {console.log(doScroll);doScroll = false}}
             >
-              <canvas ref={waveRef} height={canvasHeight} />
+              <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
               <div
                 className="progress-line"
                 style={{
@@ -202,7 +202,7 @@ function AudioLabeling() {
                 }}
               />
               <canvas
-                className="label-canvas"
+                className="audio-canvas label-canvas"
                 ref={canvasRef}
                 height={canvasHeight}
                 onMouseDown={handleMouseDown}
