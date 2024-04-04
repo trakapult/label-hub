@@ -1,50 +1,63 @@
 [
   {
-    "name": "Cat or Dog 1",
-    "admin": "abc",
-    "description": "A simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorical",
+    "name": "乐观性评分",
+    "admin": "FirstUser",
+    "description": "对一段文本的乐观性按照1-5分进行评分，1分表示非常悲观，5分表示非常乐观。\n示例：\n\t1分：每一天都像是一场无尽的黑夜，没有尽头，没有希望。\n\t5分：生活就像一幅绚丽多彩的画布，充满了无限的可能性和惊喜。",
+    "dataType": "text",
+    "labelType": "numerical",
+    "labelInfo": {"min": 1, "max": 5},
     "segments": false
   },
   {
-    "name": "Cat or Dog 2",
-    "admin": "ABC",
-    "description": "Another simple example of a binary classification task\nAnother simple example of a binary classification task\nAnother simple example of a binary classification task",
-    "dataType": "text",
-    "labelType": "numerical",
-    "segments": true
+    "name": "Cat or Dog",
+    "admin": "SecondUser",
+    "description": "判断图片显示的是猫，狗，还是其他。",
+    "dataType": "image",
+    "labelType": "categorical",
+    "labelInfo": ["猫", "狗", "其他"],
+    "segments": false
   },
   {
-    "name": "Cat or Dog 3",
-    "admin": "ABC",
-    "description": "测试中文字符",
+    "name": "Speech To Text",
+    "admin": "FirstUser",
+    "description": "播放语音样本后，写下你听到的内容。",
     "dataType": "audio",
     "labelType": "textual",
     "segments": false
   },
   {
-    "name": "Cat or Dog 4",
-    "admin": "abc",
-    "description": "Yet another simple example of a binary classification task",
+    "name": "作文评分",
+    "admin": "SecondUser",
+    "description": "对一篇作文分段进行评分，范围为1-5分，1分表示非常差，5分表示非常好。",
+    "dataType": "text",
+    "labelType": "numerical",
+    "labelInfo": {"min": 1, "max": 5},
+    "segments": true
+  },
+  {
+    "name": "年龄段标注",
+    "admin": "FirstUser",
+    "description": "对一张图片中的人脸进行年龄段标注。",
+    "dataType": "image",
+    "labelType": "categorical",
+    "labelInfo": ["儿童", "少年", "青年", "中年", "老年"],
+    "segments": true
+  },
+  {
+    "name": "分段语音标注",
+    "admin": "SecondUser",
+    "description": "对一段语音进行分段标注，写下每一段的内容。",
+    "dataType": "audio",
+    "labelType": "textual",
+    "segments": true
+  },
+  {
+    "name": "乐观性标注",
+    "admin": "FirstUser",
+    "description": "标注一段文本表达的感情是乐观的还是悲观的。",
     "dataType": "text",
     "labelType": "categorical",
-    "segments": false
-  },
-  {
-    "name": "Cat or Dog 5",
-    "admin": "abc",
-    "description": "Yet another simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorical",
-    "segments": false
-  },
-  {
-    "name": "Cat or Dog 6",
-    "admin": "abc",
-    "description": "Yet another simple example of a binary classification task",
-    "dataType": "image",
-    "labelType": "categorical",
+    "labelInfo": ["乐观", "悲观"],
     "segments": false
   }
 ]

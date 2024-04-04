@@ -4,7 +4,7 @@ import LabelingPanel, { toColor } from "./LabelingPanel";
 const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 
 function TextLabeling() {
-  const [text, setText] = useState("哇哇哇哇哇哇哇哇哇Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.");
+  const [text, setText] = useState("哇哇哇哇哇哇哇哇哇\n\n\n\n\nLorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce sit amet sapien quis justo scelerisque varius. Phasellus fringilla velit sit amet erat euismod, a efficitur magna luctus. Vivamus commodo velit eu urna gravida, eget fringilla nisl fermentum. Proin interdum justo et eros pharetra tincidunt. Donec in ipsum semper, varius felis sed, ultricies quam. Nulla tincidunt lorem id lectus suscipit, vel feugiat lectus tincidunt. Duis sit amet efficitur purus. Phasellus eget nulla id justo fringilla tempus.");
   const [segments, setSegments] = useState([{ start: 0, end: text.length, labelId: null}]);
   const [sortedSegments, setSortedSegments] = useState([{ start: 0, end: text.length, labelId: null}]);
   const textLimit = 60;
@@ -84,35 +84,32 @@ function TextLabeling() {
   }
 
   return (
-    <>
-      <h1>Text Labeling App</h1>
-      <LabelingPanel
-        dataType="text"
-        data={
-          <p onMouseUp={handleMouseUp} onAuxClick={handleAuxClick} onContextMenu={(e) => e.preventDefault()}>
-            {sortedSegments.map((s, index) => (
-              <span
-                index={index}
-                key={index}
-                style={{
-                  backgroundColor: s.labelId === null ? "white" : toColor(s.labelId, true),
-                  border: s.labelId === null ? "" : "1px solid black"
-                }}
-              >
-                {text.substring(s.start, s.end)}
-              </span>
-            ))}
-          </p>
-        }
-        attrs={["区间", "内容"]}
-        rows={
-          segments.map((s, index) =>
-            s.labelId === null ? null : ["[" + s.start + ", " + s.end + ")", getContent(index)])
-        }
-        labels={labels}
-        handleLabelChange={handleLabelChange}
-      />
-    </>
+    <LabelingPanel
+      dataType="text"
+      data={
+        <p onMouseUp={handleMouseUp} onAuxClick={handleAuxClick} onContextMenu={(e) => e.preventDefault()}>
+          {sortedSegments.map((s, index) => (
+            <span
+              index={index}
+              key={index}
+              style={{
+                backgroundColor: s.labelId === null ? "white" : toColor(s.labelId, true),
+                border: s.labelId === null ? "" : "1px solid black"
+              }}
+            >
+              {text.substring(s.start, s.end)}
+            </span>
+          ))}
+        </p>
+      }
+      attrs={["区间", "内容"]}
+      rows={
+        segments.map((s, index) =>
+          s.labelId === null ? null : ["[" + s.start + ", " + s.end + ")", getContent(index)])
+      }
+      labels={labels}
+      handleLabelChange={handleLabelChange}
+    />
   );
 }
 

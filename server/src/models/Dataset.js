@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     description: DataTypes.STRING,
     dataType: DataTypes.STRING,
     labelType: DataTypes.STRING,
+    labelInfo: DataTypes.JSON,
     segments: DataTypes.BOOLEAN
   }, {
     uniqueKeys: {

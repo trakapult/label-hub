@@ -40,7 +40,7 @@ function Login() {
               {type: "password", label: "密码"}
             ]}
             error={error}
-            buttonName={"登录"}
+            buttonText={"登录"}
             handleSubmit={login}
           />
         </div>

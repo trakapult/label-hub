@@ -19,7 +19,7 @@ async function seed () {
   }
   fs.mkdirSync("./uploads");
   fs.readdirSync("./seed/data").forEach(file => {
-    fs.copyFileSync(`./seed/data/${file}`, `./data/${file}`);
+    file.endsWith(".zip") && fs.copyFileSync(`./seed/data/${file}`, `./data/${file}`);
   });
 }
 

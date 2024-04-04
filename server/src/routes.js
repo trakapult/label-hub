@@ -15,5 +15,7 @@ module.exports = (app) => {
   app.post("/datasets", [upload.single("file"), IsAuthenticated, DatasetControllerPolicy.create], DatasetController.create),
   app.get("/datasets", IsAuthenticated, DatasetController.index),
   app.get("/dataset/:datasetId", IsAuthenticated, DatasetController.show),
+  app.put("/dataset/:datasetId", [upload.single("file"), IsAuthenticated, DatasetControllerPolicy.create], DatasetController.edit),
+  app.delete("/dataset/:datasetId", IsAuthenticated, DatasetController.delete),
   app.get("/file/:datasetId/:sampleId", IsAuthenticated, DatasetController.sendFile)
 };

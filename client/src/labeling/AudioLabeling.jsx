@@ -10,7 +10,7 @@ const chunkSize = 2000;
 
 async function drawWave(wave, canvas) {
   const ctx = wave.getContext("2d");
-  const {width, height} = wave;
+  const {height} = wave;
   const centerHeight = Math.ceil(height / 2);
   const scaleFactor = height / 2;
 
@@ -182,58 +182,55 @@ function AudioLabeling() {
   }
 
   return (
-    <>
-      <LabelingPanel
-        dataType="audio"
-        data={
-          <>
+    <LabelingPanel
+      dataType="audio"
+      data={
+        <>
+          <div
+            className="audio-container"
+            ref={containerRef}
+            onMouseDown={() => {console.log(doScroll);doScroll = false}}
+          >
+            <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
             <div
-              className="audio-canvas-container"
-              ref={containerRef}
-              onMouseDown={() => {console.log(doScroll);doScroll = false}}
-            >
-              <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
-              <div
-                className="progress-line"
-                style={{
-                  width: progressLineWidth,
-                  height: canvasHeight,
-                  left: (isNaN(progress) ? 0 : progress) - progressLineWidth / 2 + margin
-                }}
-              />
-              <canvas
-                className="audio-canvas label-canvas"
-                ref={canvasRef}
-                height={canvasHeight}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-                onMouseOver={handleMouseOver}
-                onAuxClick={handleAuxClick}
-                onContextMenu={(e) => e.preventDefault()}
-              />
-            </div>
-            <audio controls src={audio} ref={audioRef}
-              onPlay={() => doScroll = true}
-              onPause={() => doScroll = false}
-            >
-              Your browser does not support the audio element.
-            </audio>
-          </>
-        }
-        attrs={["序号", "区间"]}
-        rows={
-          convertSegments(segments).map((s, index) =>[
-            index + 1,
-            `[${s.start.toFixed(2)}, ${s.end.toFixed(2)}]`
-          ])
-        }
-        labels={labels}
-        handleLabelChange={handleLabelChange}
-        align={true}
-      />
-    </>
+              className="progress-line"
+              style={{
+                width: progressLineWidth,
+                height: canvasHeight,
+                left: (isNaN(progress) ? 0 : progress) - progressLineWidth / 2 + margin
+              }}
+            />
+            <canvas
+              className="audio-canvas label-canvas"
+              ref={canvasRef}
+              height={canvasHeight}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+              onMouseOver={handleMouseOver}
+              onAuxClick={handleAuxClick}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </div>
+          <audio controls src={audio} ref={audioRef}
+            onPlay={() => doScroll = true}
+            onPause={() => doScroll = false}
+          >
+            您的浏览器不支持音频播放。
+          </audio>
+        </>
+      }
+      attrs={["序号", "区间"]}
+      rows={
+        convertSegments(segments).map((s, index) =>[
+          index + 1,
+          `[${s.start.toFixed(2)}, ${s.end.toFixed(2)}]`
+        ])
+      }
+      labels={labels}
+      handleLabelChange={handleLabelChange}
+    />
   );
 };
 

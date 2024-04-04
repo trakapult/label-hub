@@ -1,4 +1,6 @@
-function UserForm({title, attrs, error, buttonName, handleSubmit}) {
+import Error from "../common/Error";
+
+function UserForm({title, attrs, error, buttonText, handleSubmit}) {
   return (
     <div className="card pt-4 pb-4">
       <form className="card-body text-center" onSubmit={(e) => {e.preventDefault(); handleSubmit(e);}}>
@@ -10,8 +12,8 @@ function UserForm({title, attrs, error, buttonName, handleSubmit}) {
             {attr.message && <div className="form-text">{attr.message}</div>}
           </div>
         )}
-        {error && <div className="alert alert-danger">{error}</div>}
-        <button className="btn btn-primary" type="submit">{buttonName}</button>
+        {error && <Error error={error} />}
+        <button className="btn btn-primary" type="submit">{buttonText}</button>
       </form>
     </div>
   );

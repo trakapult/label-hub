@@ -6,12 +6,12 @@ function toColor(idx, light=false) {
   return (light ? "light" : "") + colors[idx % colors.length];
 }
 
-function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height="500px", align=false}) {
+function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height="500px"}) {
   return (
     <div className="container">
       <div className="row">
         <div
-          className={"col-md-6 border rounded-start overflow-auto" + (align ? " align-content-center" : "")}
+          className={"col-md-6 border rounded-start overflow-auto" + (dataType !== "text" ? " align-content-center" : "")}
           style={{height: height}}
         >
           {data}

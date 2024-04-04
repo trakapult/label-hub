@@ -43,7 +43,7 @@ function Register() {
               {type: "password", label: "密码", message: "密码应为8-32个字符，且只能包含字母和数字"}
             ]}
             error={error}
-            buttonName={"注册"}
+            buttonText={"注册"}
             handleSubmit={register}
           />
         </div>

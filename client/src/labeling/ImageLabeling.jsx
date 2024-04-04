@@ -126,35 +126,32 @@ function ImageLabeling() {
   }
 
   return (
-    <>
-      <h1>Image Labeling</h1>
-      <LabelingPanel
-        dataType="image"
-        data={
-          <div className="img-container">
-            <img src={sampleImage} alt="sample" />
-            <canvas
-              className="img-canvas"
-              ref={canvasRef}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseUp}
-              onAuxClick={handleAuxClick}
-              onContextMenu={(e) => e.preventDefault()}
-            />
-          </div>
-        }
-        attrs={["序号", "左上角", "右下角"]}
-        rows={convertAreas(areas).map(({x0, y0, x1, y1, labelId}, index) =>[
-          index + 1,
-          `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,
-          `(${x1.toFixed(2)}, ${y1.toFixed(2)})`
-        ])}
-        labels={labels}
-        handleLabelChange={handleLabelChange}
-      />
-    </>
+    <LabelingPanel
+      dataType="image"
+      data={
+        <div className="img-container">
+          <img src={sampleImage} alt="sample" />
+          <canvas
+            className="img-canvas"
+            ref={canvasRef}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+            onAuxClick={handleAuxClick}
+            onContextMenu={(e) => e.preventDefault()}
+          />
+        </div>
+      }
+      attrs={["序号", "左上角", "右下角"]}
+      rows={convertAreas(areas).map(({x0, y0, x1, y1, labelId}, index) =>[
+        index + 1,
+        `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,
+        `(${x1.toFixed(2)}, ${y1.toFixed(2)})`
+      ])}
+      labels={labels}
+      handleLabelChange={handleLabelChange}
+    />
   );
 }
 

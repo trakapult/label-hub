@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuthContext } from "../context/AuthContext";
+import Loading from "../common/Loading";
+import Error from "../common/Error";
 
 function View ({service, params, handleLoad}) {
   const [content, setContent] = useState(null);
@@ -43,18 +45,10 @@ function View ({service, params, handleLoad}) {
     return () => clearTimeout(timer);
   }, [content]);
 
-  const loading = (
-    <div className="d-flex justify-content-center mb-3">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  );
-
   return (
     <>
-      {content === null ? loading : handleLoad(content)}
-      {error && <div className="alert alert-danger text-center">{error}</div>}
+      {content === null ? <Loading /> : handleLoad(content)}
+      {error && <Error error={error} />}
     </>
   );
 }
