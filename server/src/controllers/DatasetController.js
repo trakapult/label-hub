@@ -3,20 +3,68 @@ const { Op }  = require("sequelize");
 const fs = require("fs");
 const admZip = require("adm-zip");
 
+const saveZip = (path, file) => {
+  const zipFile = new admZip(fs.readFileSync(file.path));
+  const zipEntries = zipFile.getEntries();
+  if (zipEntries.some((zipEntry, index) =>
+    zipEntry.entryName.split("/").length > 1
+    || zipEntry.entryName.split(".").length !== 2
+    || parseInt(zipEntry.entryName.split(".")[0]) !== index)) {
+    fs.unlinkSync(file.path);
+    return false;
+  }
+  removeFiles(path);
+  fs.writeFileSync(path + ".zip", fs.readFileSync(file.path));
+  fs.unlinkSync(file.path);
+  return true;
+};
+
+const extractZip = (path) => {
+  if (fs.existsSync(path)) {
+    return;
+  }
+  const zipFile = new admZip(fs.readFileSync(path + ".zip"));
+  const zipEntries = zipFile.getEntries();
+  let maxSampleId = 0;
+  zipEntries.forEach((zipEntry) => {
+    zipFile.extractEntryTo(zipEntry.entryName, path, false, true);
+    const sampleId = parseInt(zipEntry.entryName.split(".")[0]);
+    maxSampleId = Math.max(maxSampleId, sampleId);
+  });
+  const info = {maxSampleId};
+  fs.writeFileSync(`${path}/info`, JSON.stringify(info));
+};
+
+const removeFiles = (path) => {
+  if (fs.existsSync(path)) {
+    fs.rmdirSync(path, {recursive: true});
+  }
+  if (fs.existsSync(path + ".zip")) {
+    fs.rmSync(path + ".zip");
+  }
+}
+
 module.exports = {
   async create (req, res) {
     try {
       const {name, admin, description, dataType, labelType, labelInfo, segments} = req.body;
       const file = req.file;
+      if (req.user.name !== admin) {
+        res.status(403).send({error: "您无权创建此数据集"});
+        return;
+      }
       console.log(name, admin, description, dataType, labelType, labelInfo, segments);
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
       const dataset = await Dataset.create({name, admin, description, dataType, labelType, labelInfo: labelInfoParsed, segments});
-      const path = `./data/${dataset.id}.zip`;
-      fs.writeFileSync(path, fs.readFileSync(file.path));
-      fs.unlinkSync(file.path);
+      const path = `./data/datasets/${dataset.id}`;
+      if (!saveZip(path, file)) {
+        await dataset.destroy();
+        res.status(400).send({error: "数据集文件格式错误"});
+        return;
+      }
       res.send(dataset);
     } catch(err) {
       console.log(err);
@@ -29,8 +77,8 @@ module.exports = {
   },
   async edit (req, res) {
     try {
-      let dataset = await Dataset.findByPk(req.params.datasetId);
       const {name, admin, description, dataType, labelType, labelInfo, segments} = req.body;
+      let dataset = await Dataset.findByPk(req.params.datasetId);
       if (req.user.name !== dataset.admin || req.user.name !== admin) {
         res.status(403).send({error: "您无权编辑此数据集"});
         return;
@@ -43,14 +91,12 @@ module.exports = {
       }
       dataset = await dataset.update({name, description, dataType, labelType, labelInfo: labelInfoParsed, segments});
       if (file) {
-        const path = `./data/${dataset.id}`;
-        // delete content in the directory if it exists
-        if (fs.existsSync(path)) {
-          fs.rmdirSync(path, {recursive: true});
+        const path = `./data/datasets/${dataset.id}`;
+        if (!saveZip(path, file)) {
+          await dataset.destroy();
+          res.status(400).send({error: "数据集文件格式错误"});
+          return;
         }
-        fs.rmSync(path + ".zip");
-        fs.writeFileSync(path + ".zip", fs.readFileSync(file.path));
-        fs.unlinkSync(file.path);
       }
       res.send(dataset);
     } catch(err) {
@@ -65,11 +111,8 @@ module.exports = {
         res.status(403).send({error: "您无权删除此数据集"});
         return;
       }
-      const path = `./data/${dataset.id}`;
-      if (fs.existsSync(path)) {
-        fs.rmdirSync(path, {recursive: true});
-      }
-      fs.rmSync(path + ".zip");
+      const path = `./data/datasets/${dataset.id}`;
+      removeFiles(path);
       await dataset.destroy();
       res.send(dataset);
     } catch(err) {
@@ -81,7 +124,6 @@ module.exports = {
     try {
       let datasets = null;
       const search = req.query.search;
-      // admin = req.query.admin if it is not undefined, otherwise admin = null
       const admin = req.query.admin;
       const dataType = req.query.dataType;
       const labelType = req.query.labelType;
@@ -122,21 +164,16 @@ module.exports = {
   async sendFile (req, res) {
     try {
       const dataset = await Dataset.findByPk(req.params.datasetId);
-      const path = `./data/${dataset.id}`;
-      if (!fs.existsSync(path)) {
-        const zipFile = new admZip(fs.readFileSync(path + ".zip"));
-        const zipEntries = zipFile.getEntries();
-        zipEntries.forEach((zipEntry, index) => {
-          zipFile.extractEntryTo(zipEntry.entryName, path, false, true);
-        });
-      }
+      const path = `./data/datasets/${dataset.id}`;
+      extractZip(path);
       const name = fs.readdirSync(path).find((name) => name.startsWith(req.params.sampleId + "."));
       const file = fs.readFileSync(`${path}/${name}`, dataset.dataType === "text" ? "utf-8" : "binary");
       console.log(file.length);
-      res.send(file);
+      const info = JSON.parse(fs.readFileSync(`${path}/info`));
+      res.send({file, info});
     } catch(err) {
       console.log(err);
-      res.status(400).send({error: "获取数据集文件时发生错误"});
+      res.status(400).send({error: "获取样本时发生错误"});
     }
   }
 };

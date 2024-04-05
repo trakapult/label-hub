@@ -11,15 +11,21 @@ module.exports = {
       labelInfo: Joi.alternatives(
         Joi.string().pattern(new RegExp("^\\{\"min\":\"-?\\d+\",\"max\":\"-?\\d+\"\\}$")).required(),
         Joi.string().pattern(new RegExp("^\\[\"[^\"]+\"(,\"[^\"]+\")*\\]$")).required(),
-        null
-      ),
+        "null"
+      ).required(),
       segments: Joi.boolean().required()
     });
-    const {error} = schema.validate(req.body);
+    let {error} = schema.validate(req.body);
+    if (req.body.labelType === "numerical" && !error) {
+      const {min, max} = JSON.parse(req.body.labelInfo);
+      if (min > max) {
+        error = "min应小于等于max";
+      }
+    }
     if (error) {
       console.log(req.body);
       console.log(error);
-      res.status(400).send({error: "数据集信息不完整"});
+      res.status(400).send({error: "数据集信息不完整或格式错误"});
     } else {
       next();
     }

@@ -39,7 +39,7 @@ function EditDatasetPanel ({dataset}) {
             type="text"
             id="categories"
             placeholder="类别1,类别2,...,类别n"
-            defaultValue={dataset.labelInfo?.join(",")}
+            defaultValue={dataset?.labelInfo?.join(",")}
             required
           />
         </div>
@@ -52,7 +52,7 @@ function EditDatasetPanel ({dataset}) {
             type="number"
             id="min"
             placeholder="最小值"
-            defaultValue={dataset.labelInfo?.min}
+            defaultValue={dataset?.labelInfo?.min}
             required
           />
           <input
@@ -60,7 +60,7 @@ function EditDatasetPanel ({dataset}) {
             type="number" 
             id="max"
             placeholder="最大值"
-            defaultValue={dataset.labelInfo?.max}
+            defaultValue={dataset?.labelInfo?.max}
             required
           />
         </div>
@@ -95,18 +95,21 @@ function EditDatasetPanel ({dataset}) {
       formData.append("labelType", labelType);
       formData.append("labelInfo", JSON.stringify(labelInfo));
       formData.append("segments", segments);
-      if (file) formData.append("file", file);
+      if (file) {
+        formData.append("file", file);
+      }
       console.log(formData);
       let res = null;
       if (dataset) {
         res = await DatasetService.edit(state.token, dataset.id, formData);
       } else {
-        await DatasetService.create(state.token, formData);
+        res = await DatasetService.create(state.token, formData);
       }
       if (res.error) {
         setError(res.error);
         return;
       }
+      console.log("done");
       navigate("/dataset/" + res.data.id);
     } catch (err) {
       console.log(err);
@@ -149,7 +152,7 @@ function EditDatasetPanel ({dataset}) {
           <div className="col-md-2">
             <div className="form-check form-switch">
               <input className="form-check-input" type="checkbox" id="segments" />
-              <label className="form-check-label" htmlFor="segments">分段标注</label>
+              <label className="form-check-label" htmlFor="segments">分段</label>
             </div>
           </div>
         </div>
@@ -157,7 +160,7 @@ function EditDatasetPanel ({dataset}) {
           <span className="input-group-text">样本</span>
           <input className="form-control" type="file" id="samples" accept=".zip" />
         </div>
-        <div className="form-text text-center mb-3 required">请上传zip文件</div>
+        <div className="form-text text-center mb-3">请上传zip文件，内部结构为{"{0..(n-1)}.ext"}</div>
         {error && <Error error={error} />}
         <div className="buttons text-center">
           <button className="btn btn-primary" type="submit">创建</button>

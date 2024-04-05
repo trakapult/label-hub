@@ -8,7 +8,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
   const dataTypes = [["text", "文本"], ["image", "图像"], ["audio", "音频"]];
   const labelTypes = [["numerical", "数值"], ["categorical", "分类"], ["textual", "文本"]];
 
-  const handleLoad = (file) => {
+  const handleLoad = ({file}) => {
     return (
       <div className="row justify-content-center">
           <div className="col-md-6 border rounded overflow-auto" style={{maxHeight: height}}>
@@ -26,6 +26,12 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
     <div className="card pt-4 pb-4">
       <form className="card-body">
         <h2 className="card-title mb-3">{dataset.name}</h2>
+        <div className="mb-3">
+          管理员：
+          <a className="badge bg-secondary mb-2 text-decoration-none" href={`/user/${dataset.admin}`}>
+            @{dataset.admin}
+          </a>
+        </div>
         <div className="input-group mb-3">
           <span className="input-group-text">描述</span>
           <textarea
@@ -77,8 +83,8 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
               <>
                 类别：
                 <div className="btn-group btn-group-sm">
-                  {dataset.labelInfo.map((category, index) => (
-                    <button className="btn btn-primary" type="button" key={index}>{category}</button>
+                  {dataset.labelInfo.map((label, index) => (
+                    <button className="btn btn-primary" type="button" key={index}>{label}</button>
                   ))}
                 </div>
               </>

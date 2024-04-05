@@ -10,6 +10,7 @@ async function seed () {
   console.log("Users created");
   await Dataset.bulkCreate(datasets);
   console.log("Datasets created");
+
   if (fs.existsSync("./data")) {
     fs.rmSync("./data", {recursive: true});
   }
@@ -18,9 +19,13 @@ async function seed () {
     fs.rmSync("./uploads", {recursive: true});
   }
   fs.mkdirSync("./uploads");
-  fs.readdirSync("./seed/data").forEach(file => {
-    file.endsWith(".zip") && fs.copyFileSync(`./seed/data/${file}`, `./data/${file}`);
+
+  fs.mkdirSync("./data/datasets");
+  fs.readdirSync("./seed/datasets").forEach(file => {
+    file.endsWith(".zip") && fs.copyFileSync(`./seed/datasets/${file}`, `./data/datasets/${file}`);
   });
+
+  fs.mkdirSync("./data/labels");
 }
 
 try {

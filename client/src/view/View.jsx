@@ -10,13 +10,11 @@ function View ({service, params, handleLoad}) {
 
   const get = async () => {
     try {
-      console.log(...params);
       const res = await service(state.token, ...params);
       if (res.error) {
         setError(res.error);
         return;
       }
-      console.log(res.data.length);
       setContent(res.data);
       setError("");
     } catch (err) {

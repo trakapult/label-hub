@@ -50,14 +50,5 @@
     "dataType": "audio",
     "labelType": "textual",
     "segments": true
-  },
-  {
-    "name": "乐观性标注",
-    "admin": "FirstUser",
-    "description": "标注一段文本表达的感情是乐观的还是悲观的。",
-    "dataType": "text",
-    "labelType": "categorical",
-    "labelInfo": ["乐观", "悲观"],
-    "segments": false
   }
 ]

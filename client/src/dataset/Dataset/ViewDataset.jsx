@@ -7,7 +7,7 @@ function ViewDataset () {
   const datasetId = useParams().datasetId;
   const navigate = useNavigate();
   const handleClick = (dataset) => {
-    navigate(`/label/${dataset.id}`);
+    navigate(`/labeling/${dataset.id}`);
   }
   const handleLoad = (dataset) => {
     return (
