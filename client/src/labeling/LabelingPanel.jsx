@@ -1,62 +1,65 @@
-const colors = ["blue", "coral", "green", "gray", "salmon", "skyblue"];
+import { useEffect, useState } from "react";
+import NumericalLabels from "./Labels/NumericalLabels";
+import CategoricalLabels from "./Labels/CategoricalLabels";
+import TextualLabels from "./Labels/TextualLabels";
+import SaveButton from "./SaveButton";
 
-function toColor(idx, light=false) {
-  if (idx === -1)
-    return "white";
-  return (light ? "light" : "") + colors[idx % colors.length];
-}
+const height = 300;
 
-function LabelingPanel({dataType, data, attrs, rows, labels, handleLabelChange, height="500px"}) {
+function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabel, saveLabel}) {
+  const [textualLabel, setTextualLabel] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (labelType === "textual") {
+      if (curLabel) {
+        setTextualLabel(curLabel);
+        setSaved(true);
+      } else {
+        setTextualLabel("");
+        setSaved(false);
+      }
+    }
+  }, [sampleId, curLabel]);
+
+  useEffect(() => {
+    const handleKey = (e) => {
+      if (e.key >= "0" && e.key <= "9") {
+        const button = document.getElementById(`button${e.key}`);
+        if (button) button.click();
+      }
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  });
+
   return (
-    <div className="container">
-      <div className="row">
-        <div
-          className={"col-md-6 border rounded-start overflow-auto" + (dataType !== "text" ? " align-content-center" : "")}
-          style={{height: height}}
-        >
-          {data}
-        </div>
-        <div className="col-md-6 border rounded-end overflow-auto" style={{height: height}}>
-          <table className="table table-striped">
-            <thead>
-              <tr>
-                {attrs.map((attr, index) => <th key={index}>{attr}</th>)}
-                <th>标签</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) =>
-                row === null ? null : (
-                  <tr key={index}>
-                    {row.map((value, index) => <td key={index}>{value}</td>)}
-                    <td>
-                      <div className="btn-group btn-group-sm" defaultValue={0} onClick={(e) => {
-                        e.target.parentElement.childNodes.forEach((button) => {
-                          button.classList.remove("active");
-                        });
-                        e.target.classList.add("active");
-                        handleLabelChange(index, e)
-                      }}>
-                        {labels.map((label, index) =>
-                          <button
-                            className={"btn btn-primary" + (dataType !== "text" && index === 0 ? " active" : "")}
-                            value={index}
-                            key={index}>
-                            {label}
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                )
-              )}
-            </tbody>
-          </table>
+    <>
+      <div className="row justify-content-center mb-3">
+        <div className="col-md-6 border rounded-end overflow-auto" style={{maxHeight: height}}>
+          <div className="img-container">
+            {dataType === "text" && <p>{file}</p>}
+            {dataType === "image" && <img src={`data:image;base64,${btoa(file)}`} alt="sample" />}
+            {dataType === "audio" && <audio src={`data:audio/mp3;base64,${btoa(file)}`} controls />}
+          </div>
         </div>
       </div>
-    </div>
-  )
+      <div className="row justify-content-center mb-3">
+        {labelType === "numerical" &&
+          <NumericalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
+        }
+        {labelType === "categorical" && (
+          <CategoricalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
+        )}
+        {labelType === "textual" && (
+          <form className="row justify-content-center" onSubmit={(e) => {e.preventDefault(); saveLabel(textualLabel); setSaved(true);}}>
+            <TextualLabels sampleId={sampleId} curLabel={curLabel} saveLabel={(e) => {setTextualLabel(e); setSaved(false);}} />
+            <SaveButton saved={saved} />
+          </form>
+        )}
+      </div>
+    </>
+  );
 }
 
 export default LabelingPanel;
-export { toColor };

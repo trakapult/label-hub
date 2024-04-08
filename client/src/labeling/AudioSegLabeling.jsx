@@ -1,14 +1,15 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./AudioLabeling.css";
-import audio from "../assets/sample.mp3";
-import LabelingPanel, {toColor} from "./LabelingPanel";
+import { useState, useRef, useEffect } from "react";
+import "./Labeling.css";
+import SegLabelingPanel, { getColor } from "./SegLabelingPanel";
+import SaveButton from "./SaveButton";
 
-const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
 const canvasHeight = 200;
 const margin = 10;
 const chunkSize = 2000;
+const progressLineWidth = 2;
+const fontSize = 12;
 
-async function drawWave(wave, canvas) {
+async function drawWave(audio, wave, canvas) {
   const ctx = wave.getContext("2d");
   const {height} = wave;
   const centerHeight = Math.ceil(height / 2);
@@ -26,6 +27,7 @@ async function drawWave(wave, canvas) {
       })
     );
   }
+  ctx.clearRect(0, 0, wave.width, wave.height);
   wave.width = Math.ceil(float32Array.length / chunkSize + margin * 2);
   canvas.width = wave.width;
   for (let index in array) {
@@ -40,13 +42,59 @@ async function drawWave(wave, canvas) {
 let doScroll = true;
 let mouseLeaveInterval = null;
 
-function AudioLabeling() {
-  const [progress, setProgress] = useState(0);
-  const progressLineWidth = 2;
+function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabelData, saveLabelData}) {
   const audioRef = useRef(null);
   const containerRef = useRef(null);
   const waveRef = useRef(null);
   const canvasRef = useRef(null);
+  const [canvas, setCanvas] = useState(null);
+  const [progress, setProgress] = useState(0);
+  const [segments, setSegments] = useState([]);
+  const [curSegment, setCurSegment] = useState(null);
+  const [saved, setSaved] = useState(false);
+
+  const labelDataToSegments = (labelData) => {
+    if (!canvas || !labelData || !audioRef) return [];
+    const duration = fileInfo.duration;
+    const canvasWidth = canvas.getBoundingClientRect().width;
+    console.log("duration canvasWidth", duration, canvasWidth);
+    const segments = labelData.map(({start, end, label}) => ({
+      start: start / duration * canvasWidth + margin,
+      end: end / duration * canvasWidth + margin,
+      label
+    }));
+    return segments;
+  }
+
+  const segmentsToLabelData = (segments) => {
+    if (!canvas || !audioRef) return [];
+    const duration = fileInfo.duration;
+    const canvasWidth = canvas.getBoundingClientRect().width;
+    console.log("duration canvasWidth", duration, canvasWidth);
+    const labelData = segments.map(({start, end, label}) => ({
+      start: (start - margin) / canvasWidth * duration,
+      end: (end - margin) / canvasWidth * duration,
+      label
+    }));
+    return labelData;
+  }
+
+  useEffect(() => {
+    drawWave(`data:audio/wav;base64,${btoa(file)}`, waveRef.current, canvasRef.current);
+  }, [file]);
+
+  useEffect(() => {
+    const s = labelDataToSegments(curLabelData);
+    setSegments(s);
+    fillSegments(s);
+    setSaved(curLabelData ? true : false);
+  }, [sampleId, fileInfo]);
+
+  useEffect(() => {
+    canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
+    canvasRef.current.height = canvasHeight;
+    setCanvas(canvasRef.current);
+  }, [canvasRef]);
 
   setInterval(() => {
     const audioElement = audioRef.current;
@@ -55,78 +103,76 @@ function AudioLabeling() {
     if (!audioElement || !container || !canvas) return;
     const currentTime = audioElement.currentTime;
     const duration = audioElement.duration;
-    const newProgress = (currentTime / duration) * canvas.width;
+    const newProgress = (currentTime / duration) * (canvas.width - margin * 2);
     setProgress(newProgress);
     if (doScroll)
       container.scrollLeft = newProgress - container.clientWidth / 2;
   }, 50);
 
-  useEffect(() => {
-    drawWave(waveRef.current, canvasRef.current);
-  }, []);
-
-  const [segments, setSegments] = useState([]);
-  const [currentSegment, setCurrentSegment] = useState(null);
   const fill = (ctx, intv, index) => {
+    console.log("fill", intv, index);
     const {start, end} = intv;
-    ctx.fillStyle = toColor(intv.labelId);
+    const canvasHeight = canvas.getBoundingClientRect().height;
+    ctx.fillStyle = getColor(index);
     ctx.globalAlpha = 0.5;
-    ctx.fillRect(start, 0, end - start, canvasRef.current.height);
-    ctx.strokeStyle = toColor(intv.labelId);
+    ctx.fillRect(start, 0, end - start, canvas.height);
+    ctx.strokeStyle = getColor(index);
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
-    ctx.strokeRect(start, ctx.lineWidth / 2, end - start, canvasRef.current.height - ctx.lineWidth);
-    const textHeight = 20;
-    ctx.font = textHeight + "px consolas";
+    ctx.strokeRect(start, ctx.lineWidth / 2, end - start, canvas.height - ctx.lineWidth);
+    const textHeight = fontSize / canvasHeight * canvas.height;
+    ctx.font = fontSize + "px arial";
     ctx.fillStyle = "white";
-    const centerX = (start + end) / 2, centerY = canvasRef.current.height / 2;
-    const segmentText = "片段" + (index + 1);
+    const centerX = (start + end) / 2, centerY = canvas.height / 2;
+    const segmentText = index + 1;
     ctx.fillText(segmentText, centerX - ctx.measureText(segmentText).width / 2, centerY - textHeight / 4);
-    const labelText = labels[intv.labelId];
+    const labelText = intv.label === null ? "" : intv.label;
     ctx.fillText(labelText, centerX - ctx.measureText(labelText).width / 2, centerY + textHeight * 3 / 4);
   }
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
+  const fillSegments = (s) => {
+    if (!canvas) return;
+    console.log("fillSegments", s);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    segments.forEach((interval, index) => {
-      fill(ctx, interval, index);
+    s.forEach((intv, index) => {
+      if (intv) fill(ctx, intv, index);
     });
-    if (currentSegment !== null)
-      fill(ctx, currentSegment, segments.length);
-  }, [segments, currentSegment]);
+  }
+
+  useEffect(() => {
+    fillSegments([...segments, curSegment]);
+  }, [canvas, segments, curSegment]);
 
   const handleMouseDown = (e) => {
     if (e.button !== 0) return;
-    const canvas = canvasRef.current;
     const x = e.clientX - canvas.getBoundingClientRect().left;
-    setCurrentSegment({start: x, end: x, labelId: 0});
+    setCurSegment({start: x, end: x, label: null});
   }
 
   const handleMouseMove = (e) => {
-    if (!currentSegment) return;
+    if (!curSegment) return;
     if (e.buttons !== 1) {
       handleMouseUp();
       return;
     }
-    const canvas = canvasRef.current;
     const x = e.clientX - canvas.getBoundingClientRect().left;
-    setCurrentSegment({...currentSegment, end: x});
+    setCurSegment({...curSegment, end: x});
   }
 
   const handleMouseUp = () => {
-    if (!currentSegment) return;
-    if (currentSegment.end < currentSegment.start) {
-      const temp = currentSegment.start;
-      currentSegment.start = currentSegment.end;
-      currentSegment.end = temp;
+    if (!curSegment) return;
+    if (curSegment.end < curSegment.start) {
+      const temp = curSegment.start;
+      curSegment.start = curSegment.end;
+      curSegment.end = temp;
     }
-    console.log("Mouse up, currentSegment:", currentSegment);
-    console.log("converted segments:", convertSegments([...segments, currentSegment]));
-    if (currentSegment.end - currentSegment.start > 0)
-      setSegments([...segments, currentSegment]);
-    setCurrentSegment(null);
+    console.log("Mouse up, curSegment:", curSegment);
+    console.log("converted segments:", segmentsToLabelData([...segments, curSegment]));
+    if (curSegment.end - curSegment.start > 0)
+      setSegments([...segments, curSegment]);
+    setCurSegment(null);
+    setSaved(false);
   }
 
   const handleMouseLeave = (e) => {
@@ -134,18 +180,17 @@ function AudioLabeling() {
       handleMouseOver();
       return;
     }
-    const canvas = canvasRef.current;
     const container = containerRef.current;
     const left = container.getBoundingClientRect().left, right = container.getBoundingClientRect().right;
     console.log("mouse leave", left, right, e.clientX);
     mouseLeaveInterval = setInterval(() => {
       if (e.clientX < left + margin) {
         container.scrollLeft -= 10;
-        setCurrentSegment({...currentSegment, end: left - canvas.getBoundingClientRect().left});
+        setCurSegment({...curSegment, end: left - canvas.getBoundingClientRect().left});
       }
       if (e.clientX > right - margin) {
         container.scrollLeft += 10;
-        setCurrentSegment({...currentSegment, end: right - canvas.getBoundingClientRect().left});
+        setCurSegment({...curSegment, end: right - canvas.getBoundingClientRect().left});
       }
     }, 50);
   }
@@ -159,78 +204,82 @@ function AudioLabeling() {
     }
   }
 
-  const handleAuxClick = (e) => {
+  const handleAuxClick = () => {
     const newSegments = [...segments];
     newSegments.pop();
     setSegments(newSegments);
-    setCurrentSegment(null);
+    setCurSegment(null);
+    setSaved(false);
   }
 
-  const handleLabelChange = (index, event) => {
+  const saveLabel = (index) => (value) => {
     const newSegments = [...segments];
-    newSegments[index].labelId = parseInt(event.target.value);
+    newSegments[index].label = value;
     setSegments(newSegments);
+    setSaved(false);
   };
 
-  const convertSegments = (segments) => {
-    const converted = segments.map(({start, end, labelId}) => ({
-      start: Math.max(0, (start - margin) / waveRef.current.width) * audioRef.current.duration,
-      end: Math.min(1, (end - margin) / waveRef.current.width) * audioRef.current.duration,
-      labelId
-    }));
-    return converted;
-  }
-
   return (
-    <LabelingPanel
-      dataType="audio"
-      data={
-        <>
-          <div
-            className="audio-container"
-            ref={containerRef}
-            onMouseDown={() => {console.log(doScroll);doScroll = false}}
-          >
-            <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
+    <form
+      className="row text-center"
+      onSubmit={(e) => {
+        e.preventDefault();
+        saveLabelData(segmentsToLabelData(segments));
+        setSaved(true);
+      }}
+    >
+      <SegLabelingPanel
+        data={
+          <>
             <div
-              className="progress-line"
-              style={{
-                width: progressLineWidth,
-                height: canvasHeight,
-                left: (isNaN(progress) ? 0 : progress) - progressLineWidth / 2 + margin
-              }}
-            />
-            <canvas
-              className="audio-canvas label-canvas"
-              ref={canvasRef}
-              height={canvasHeight}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseLeave}
-              onMouseOver={handleMouseOver}
-              onAuxClick={handleAuxClick}
-              onContextMenu={(e) => e.preventDefault()}
-            />
-          </div>
-          <audio controls src={audio} ref={audioRef}
-            onPlay={() => doScroll = true}
-            onPause={() => doScroll = false}
-          >
-            您的浏览器不支持音频播放。
-          </audio>
-        </>
-      }
-      attrs={["序号", "区间"]}
-      rows={
-        convertSegments(segments).map((s, index) =>[
-          index + 1,
-          `[${s.start.toFixed(2)}, ${s.end.toFixed(2)}]`
-        ])
-      }
-      labels={labels}
-      handleLabelChange={handleLabelChange}
-    />
+              className="audio-container"
+              ref={containerRef}
+              onMouseDown={() => {console.log(doScroll); doScroll = false;}}
+            >
+              <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
+              <div
+                className="progress-line"
+                style={{
+                  width: progressLineWidth,
+                  height: canvasHeight,
+                  left: (isNaN(progress) ? 0 : progress) - progressLineWidth / 2 + margin
+                }}
+              />
+              <canvas
+                className="audio-canvas label-canvas"
+                ref={canvasRef}
+                height={canvasHeight}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
+                onMouseOver={handleMouseOver}
+                onAuxClick={handleAuxClick}
+                onContextMenu={(e) => e.preventDefault()}
+              />
+            </div>
+            <audio controls src={`data:audio/wav;base64,${btoa(file)}`} ref={audioRef}
+              onPlay={() => doScroll = true}
+              onPause={() => doScroll = false}
+            >
+              您的浏览器不支持音频播放。
+            </audio>
+          </>
+        }
+        attrs={["序号", "区间"]}
+        rows={
+          segmentsToLabelData(segments).map((s, index) =>[
+            index + 1,
+            `[${s.start.toFixed(2)}, ${s.end.toFixed(2)}]`
+          ])
+        }
+        labelType={labelType}
+        labelInfo={labelInfo}
+        saveLabel={saveLabel}
+        curLabelData={segments}
+      />
+      <SaveButton saved={saved} />
+    </form>
   );
 };
 

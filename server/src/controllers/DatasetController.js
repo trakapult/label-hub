@@ -2,6 +2,10 @@ const { Dataset } = require("../models");
 const { Op }  = require("sequelize");
 const fs = require("fs");
 const admZip = require("adm-zip");
+const sharp = require("sharp");
+const ffmpeg = require("fluent-ffmpeg");
+const ffprobe = require("ffprobe-static");
+ffmpeg.setFfprobePath(ffprobe.path);
 
 const saveZip = (path, file) => {
   const zipFile = new admZip(fs.readFileSync(file.path));
@@ -25,14 +29,9 @@ const extractZip = (path) => {
   }
   const zipFile = new admZip(fs.readFileSync(path + ".zip"));
   const zipEntries = zipFile.getEntries();
-  let maxSampleId = 0;
   zipEntries.forEach((zipEntry) => {
     zipFile.extractEntryTo(zipEntry.entryName, path, false, true);
-    const sampleId = parseInt(zipEntry.entryName.split(".")[0]);
-    maxSampleId = Math.max(maxSampleId, sampleId);
   });
-  const info = {maxSampleId};
-  fs.writeFileSync(`${path}/info`, JSON.stringify(info));
 };
 
 const removeFiles = (path) => {
@@ -53,12 +52,17 @@ module.exports = {
         res.status(403).send({error: "您无权创建此数据集"});
         return;
       }
-      console.log(name, admin, description, dataType, labelType, labelInfo, segments);
+      if (!file) {
+        res.status(400).send({error: "数据集文件未上传"});
+        return;
+      }
+      const sampleNum = new admZip(fs.readFileSync(file.path)).getEntries().length;
+      console.log(name, admin, description, sampleNum, dataType, labelType, labelInfo, segments);
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
-      const dataset = await Dataset.create({name, admin, description, dataType, labelType, labelInfo: labelInfoParsed, segments});
+      const dataset = await Dataset.create({name, admin, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments});
       const path = `./data/datasets/${dataset.id}`;
       if (!saveZip(path, file)) {
         await dataset.destroy();
@@ -84,12 +88,13 @@ module.exports = {
         return;
       }
       const file = req.file;
-      console.log(name, description, dataType, labelType, labelInfo, segments);
+      const sampleNum = file ? new admZip(fs.readFileSync(file.path)).getEntries().length : dataset.sampleNum;
+      console.log(name, description, sampleNum, dataType, labelType, labelInfo, segments);
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
-      dataset = await dataset.update({name, description, dataType, labelType, labelInfo: labelInfoParsed, segments});
+      dataset = await dataset.update({name, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments});
       if (file) {
         const path = `./data/datasets/${dataset.id}`;
         if (!saveZip(path, file)) {
@@ -169,8 +174,26 @@ module.exports = {
       const name = fs.readdirSync(path).find((name) => name.startsWith(req.params.sampleId + "."));
       const file = fs.readFileSync(`${path}/${name}`, dataset.dataType === "text" ? "utf-8" : "binary");
       console.log(file.length);
-      const info = JSON.parse(fs.readFileSync(`${path}/info`));
-      res.send({file, info});
+      let fileInfo = null;
+      if (dataset.dataType === "text") {
+        fileInfo = {length: file.length};
+      } else if (dataset.dataType === "image") {
+        const {width, height} = await sharp(`${path}/${name}`).metadata();
+        fileInfo = {width, height};
+      } else if (dataset.dataType === "audio") {
+        const getDuration = (filePath) => {
+          return new Promise((resolve, reject) => {
+            ffmpeg.ffprobe(filePath, (err, metadata) => {
+              if (err) reject(err);
+              resolve(metadata.format.duration);
+            });
+          });
+        };
+        const duration = await getDuration(`${path}/${name}`);
+        console.log("duration", duration);
+        fileInfo = {duration};
+      }
+      res.send({file, fileInfo});
     } catch(err) {
       console.log(err);
       res.status(400).send({error: "获取样本时发生错误"});

@@ -1,14 +1,30 @@
+import { useAuthContext } from "../../context/AuthContext";
 import View from "../../view/View";
 import DatasetService from "../DatasetService";
+import LabelService from "../../labeling/LabelService";
 import "./ViewDatasetPanel.css";
 
 const height = 300;
 
 function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
+  const {state} = useAuthContext();
   const dataTypes = [["text", "文本"], ["image", "图像"], ["audio", "音频"]];
   const labelTypes = [["numerical", "数值"], ["categorical", "分类"], ["textual", "文本"]];
 
-  const handleLoad = ({file}) => {
+  const handleLabelsLoad = (labels) => {
+    const {label, data} = labels;
+    if (label === null ||state.user.name !== label.labeler) return;
+    const labeledNum = Object.keys(data).length;
+    return (
+      <div className="progress mb-3">
+        <div className="progress-bar" style={{width: `${labeledNum / dataset.sampleNum * 100}%`}}>
+          {labeledNum}/{dataset.sampleNum}
+        </div>
+      </div>
+    );
+  }
+
+  const handleSampleLoad = ({file}) => {
     return (
       <div className="row justify-content-center">
           <div className="col-md-6 border rounded overflow-auto" style={{maxHeight: height}}>
@@ -25,6 +41,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
   return (
     <div className="card pt-4 pb-4">
       <form className="card-body">
+        <View service={LabelService.get} params={[dataset.id, state.user.name]} handleLoad={handleLabelsLoad} />
         <h2 className="card-title mb-3">{dataset.name}</h2>
         <div className="mb-3">
           管理员：
@@ -99,7 +116,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
         </div>
         样本示例：
         <br />
-        <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleLoad} />
+        <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleSampleLoad} />
         <div className="text-center mt-3">
           <button className="btn btn-primary" type="button" onClick={() => handleClick(dataset)}>{buttonText}</button>
         </div>

@@ -4,6 +4,7 @@ module.exports = (sequelize, DataTypes) => {
     admin: DataTypes.STRING,
     description: DataTypes.STRING,
     dataType: DataTypes.STRING,
+    sampleNum: DataTypes.INTEGER,
     labelType: DataTypes.STRING,
     labelInfo: DataTypes.JSON,
     segments: DataTypes.BOOLEAN

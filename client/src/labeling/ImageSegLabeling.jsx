@@ -1,18 +1,53 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./ImageLabeling.css";
-import sampleImage from "../assets/sample.jpg";
-import LabelingPanel, { toColor } from "./LabelingPanel";
+import { useState, useRef, useEffect } from "react";
+import "./Labeling.css";
+import SegLabelingPanel, { getColor } from "./SegLabelingPanel";
+import SaveButton from "./SaveButton";
 
-const labels = ["Zero", "One", "Two", "Three", "Four", "Five"];
+const fontSize = 12;
 
-const image = new Image();
-image.src = sampleImage;
-
-function ImageLabeling() {
+function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabelData, saveLabelData}) {
   const canvasRef = useRef(null);
   const [canvas, setCanvas] = useState(null);
   const [areas, setAreas] = useState([]);
-  const [currentArea, setCurrentArea] = useState(null);
+  const [curArea, setCurArea] = useState(null);
+  const [saved, setSaved] = useState(false);
+
+  const labelDataToAreas = (labelData) => {
+    if (!canvas || !labelData) return [];
+    const imageWidth = fileInfo.width, imageHeight = fileInfo.height;
+    const rect = canvas.getBoundingClientRect();
+    const canvasWidth = rect.width, canvasHeight = rect.height;
+    const areas = labelData.map(({x0, y0, x1, y1, label}) => ({
+      x: x0 / imageWidth * canvasWidth,
+      y: y0 / imageHeight * canvasHeight,
+      width: (x1 - x0) / imageWidth * canvasWidth,
+      height: (y1 - y0) / imageHeight * canvasHeight,
+      label
+    }));
+    return areas;
+  }
+
+  const areasToLabelData = (areas) => {
+    if (!canvas) return [];
+    const imageWidth = fileInfo.width, imageHeight = fileInfo.height;
+    const rect = canvas.getBoundingClientRect();
+    const canvasWidth = rect.width, canvasHeight = rect.height;
+    const labelData = areas.map(({x, y, width, height, label}) => ({
+      x0: x / canvasWidth * imageWidth,
+      y0: y / canvasHeight * imageHeight,
+      x1: (x + width) / canvasWidth * imageWidth,
+      y1: (y + height) / canvasHeight * imageHeight,
+      label
+    }));
+    return labelData;
+  }
+
+  useEffect(() => {
+    const a = labelDataToAreas(curLabelData);
+    setAreas(a);
+    fillAreas(a);
+    setSaved(curLabelData ? true : false);
+  }, [sampleId, fileInfo]);
 
   useEffect(() => {
     canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
@@ -28,131 +63,133 @@ function ImageLabeling() {
     const width = rect.width / canvasWidth * canvas.width;
     const height = rect.height / canvasHeight * canvas.height;
     console.log(canvasWidth, canvasHeight, canvas.width, canvas.height);
-    ctx.fillStyle = toColor(rect.labelId);
+    ctx.fillStyle = getColor(index);
     ctx.globalAlpha = 0.5;
     ctx.fillRect(x, y, width, height);
-    ctx.strokeStyle = toColor(rect.labelId);
+    ctx.strokeStyle = getColor(index);
     ctx.globalAlpha = 1;
     ctx.lineWidth = 1;
     ctx.strokeRect(x, y + ctx.lineWidth / 2, width, height - ctx.lineWidth);
-    const textHeight = 20 / canvasWidth * canvas.width;
-    ctx.font = textHeight + "px consolas";
+    const textHeight = fontSize / canvasHeight * canvas.height;
+    ctx.font = fontSize + "px arial";
     ctx.fillStyle = "white";
     const centerX = x + width / 2, centerY = y + height / 2;
-    const areaText = "区域" + (index + 1);
+    const areaText = index + 1;
     const areaTextWidth = ctx.measureText(areaText).width;
     ctx.fillText(areaText, centerX - areaTextWidth / 2, centerY - textHeight / 4);
-    const labelText = labels[rect.labelId];
+    const labelText = rect.label === null ? "" : rect.label;
     const labelTextWidth = ctx.measureText(labelText).width;
     ctx.fillText(labelText, centerX - labelTextWidth / 2, centerY + textHeight * 3 / 4);
   }
 
-  useEffect(() => {
-    if (!canvas || !areas) return;
+  const fillAreas = (a) => {
+    if (!canvas || !a) return;
+    console.log("fillAreas", a);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    areas.forEach((rect, index) => {
-      fill(ctx, rect, index);
+    a.forEach((rect, index) => {
+      if (rect) fill(ctx, rect, index);
     });
-    if (currentArea !== null)
-      fill(ctx, currentArea, areas.length);
-  }, [canvas, areas, currentArea]);
+  }
+
+  useEffect(() => {
+    fillAreas([...areas, curArea]);
+  }, [canvas, areas, curArea]);
 
   const handleMouseDown = (e) => {
     if (e.button !== 0) return;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    setCurrentArea({x, y, labelId: 0});
-    console.log("Mouse down, currentArea:", {x, y, labelId: 0});
+    setCurArea({x, y, label: ""});
+    console.log("Mouse down, curArea:", {x, y, label: ""});
   };
 
   const handleMouseMove = (e) => {
-    if (!currentArea) return;
+    if (!curArea) return;
     console.log("mouse move");
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    const width = x - currentArea.x;
-    const height = y - currentArea.y;
-    setCurrentArea({...currentArea, width, height});
-    console.log("Mouse move, currentArea:", currentArea);
+    const width = x - curArea.x;
+    const height = y - curArea.y;
+    setCurArea({...curArea, width, height});
+    console.log("Mouse move, curArea:", curArea);
   };
 
   const handleMouseUp = () => {
-    console.log("Mouse up, currentArea:", currentArea);
-    if (!currentArea) return;
-    if (currentArea.width < 0) {
-      currentArea.x += currentArea.width;
-      currentArea.width *= -1;
+    console.log("Mouse up, curArea:", curArea);
+    if (!curArea) return;
+    if (curArea.width < 0) {
+      curArea.x += curArea.width;
+      curArea.width *= -1;
     }
-    if (currentArea.height < 0) {
-      currentArea.y += currentArea.height;
-      currentArea.height *= -1;
+    if (curArea.height < 0) {
+      curArea.y += curArea.height;
+      curArea.height *= -1;
     }
-    if (currentArea.width > 0 && currentArea.height > 0)
-      setAreas([...areas, currentArea]);
-    setCurrentArea(null);
+    if (curArea.width > 0 && curArea.height > 0)
+      setAreas([...areas, curArea]);
+    setCurArea(null);
+    setSaved(false);
   };
 
-  const handleAuxClick = (e) => {
+  const handleAuxClick = () => {
     const newAreas = [...areas];
     newAreas.pop();
     setAreas(newAreas);
-    setCurrentArea(null);
+    setCurArea(null);
+    setSaved(false);
   }
 
-  const handleLabelChange = (index, event) => {
+  const saveLabel = (index) => (value) => {
     const newAreas = [...areas];
-    newAreas[index].labelId = event.target.value;
-    console.log("Rank change, newAreas:", newAreas);
+    newAreas[index].label = value;
     setAreas(newAreas);
+    setSaved(false);
   };
 
-  const convertAreas = (areas) => {
-    const imageWidth = image.width, imageHeight = image.height;
-    if (!canvas) return [];
-    const rect = canvas.getBoundingClientRect();
-    const canvasWidth = rect.width, canvasHeight = rect.height;
-    const converted = areas.map(({x, y, width, height, labelId}) => ({
-      x0: x / canvasWidth * imageWidth,
-      y0: y / canvasHeight * imageHeight,
-      x1: (x + width) / canvasWidth * imageWidth,
-      y1: (y + height) / canvasHeight * imageHeight,
-      labelId
-    }));
-    console.log("converted", converted);
-    return converted;
-  }
-
   return (
-    <LabelingPanel
-      dataType="image"
-      data={
-        <div className="img-container">
-          <img src={sampleImage} alt="sample" />
-          <canvas
-            className="img-canvas"
-            ref={canvasRef}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onAuxClick={handleAuxClick}
-            onContextMenu={(e) => e.preventDefault()}
-          />
-        </div>
-      }
-      attrs={["序号", "左上角", "右下角"]}
-      rows={convertAreas(areas).map(({x0, y0, x1, y1, labelId}, index) =>[
-        index + 1,
-        `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,
-        `(${x1.toFixed(2)}, ${y1.toFixed(2)})`
-      ])}
-      labels={labels}
-      handleLabelChange={handleLabelChange}
-    />
+    <form
+      className="row text-center"
+      onSubmit={(e) => {
+        e.preventDefault();
+        saveLabelData(areasToLabelData(areas));
+        setSaved(true);
+      }}
+    >
+      <SegLabelingPanel
+        data={
+          <>
+            <img src={`data:image;base64,${btoa(file)}`} alt="sample" />
+            <canvas
+              className="img-canvas"
+              ref={canvasRef}
+              width={1000}
+              height={1000}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+              onAuxClick={handleAuxClick}
+              onContextMenu={(e) => e.preventDefault()}
+            />
+          </>
+        }
+        attrs={["序号", "左上角", "右下角"]}
+        rows={areasToLabelData(areas).map(({x0, y0, x1, y1, label}, index) =>[
+          index + 1,
+          `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,
+          `(${x1.toFixed(2)}, ${y1.toFixed(2)})`
+        ])}
+        labelType={labelType}
+        labelInfo={labelInfo}
+        saveLabel={saveLabel}
+        curLabelData={areas}
+      />
+      <SaveButton saved={saved} />
+    </form>
   );
 }
 
-export default ImageLabeling;
+export default ImageSegLabeling;
