@@ -17,13 +17,13 @@ const routes = [
 
   {path: "/login", name: "Login", element: <Login />},
   {path: "/register", name: "Register", element: <Register />},
-  {path: "/user/:userName", name: "User", element: <ViewUser />},
+  {path: "/user/:userName", name: "ViewUser", element: <ViewUser />},
 
   {path: "/create", name: "CreateDataset", element: <CreateDataset />},
   {path: "/dataset/:datasetId/edit", name: "EditDataset", element: <EditDataset />},
   {path: "/dataset/:datasetId/delete", name: "DeleteDataset", element: <DeleteDataset />},
   {path: "/datasets", name: "Datasets", element: <Datasets />},
-  {path: "/dataset/:datasetId", name: "Dataset", element: <ViewDataset />},
+  {path: "/dataset/:datasetId", name: "ViewDataset", element: <ViewDataset />},
 
   {path: "/labeling/:datasetId", name: "Labeling", element: <Labeling />}
 ];

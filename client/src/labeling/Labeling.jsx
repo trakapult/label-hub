@@ -21,31 +21,30 @@ function Labeling () {
 
   useEffect(() => {
     if (!state.isLoggedIn) return;
-    const loadLabels = async () => {
-      const res = await LabelService.get(state.token, datasetId, state.user.name);
+    const loadLabelData = async () => {
+      let res = await LabelService.get(state.token, datasetId, state.user.name);
       if (res.error) {
         setError(res.error);
         return;
       }
-      const {label, data} = res.data;
-      if (label) {
-        setLabelData(data);
-        console.log("data", data, data[sampleId]);
-        setCurLabelData(data[sampleId] || "");
+      const {label, labeledNum} = res.data;
+      if (!label) return;
+      res = await LabelService.getLabelData(state.token, datasetId, state.user.name);
+      if (res.error) {
+        setError(res.error);
+        return;
       }
+      const labelData = res.data;
+      setLabelData(labelData);
+      const id = Math.max(0, labeledNum - 1);
+      setSampleId(id);
+      setCurLabelData(labelData[id] || "");
     }
-    loadLabels();
+    loadLabelData();
   }, [state, datasetId]);
-
-  /*useEffect(() => {
-    const textualLabel = document.getElementById("textualLabel");
-    if (textualLabel)
-      textualLabel.value = curLabelData;
-  }, [sampleId, curLabelData]);*/
 
   useEffect(() => {
     const handleKey = (e) => {
-      // if focus on input, ignore key event
       if (document.activeElement.tagName === "TEXTAREA") return;
       if (e.key === "ArrowLeft") {
         const button = document.getElementById("prev");
@@ -68,7 +67,6 @@ function Labeling () {
       const nextSampleId = sampleId + step;
       if (0 <= nextSampleId && nextSampleId < dataset.sampleNum) {
         setSampleId(nextSampleId);
-        console.log("nextSampleId", nextSampleId, (labelData[nextSampleId] || ""));
         setCurLabelData(labelData[nextSampleId] || "");
         return true;
       }
@@ -76,17 +74,14 @@ function Labeling () {
     }
 
     const saveLabelData = (value) => {
-      console.log("saveLabelData", value);
       const oldLabel = labelData[sampleId];
       const newLabel = value || oldLabel;
-      console.log(oldLabel, newLabel);
       if (!newLabel) return;
       let newLabelData = labelData;
       if (newLabel !== oldLabel) {
         newLabelData = {...labelData, [sampleId]: newLabel};
         setLabelData(newLabelData);
       }
-      console.log("newLabelData", JSON.stringify(newLabelData));
       if (autojump) {
         if (!move(1)())
           setCurLabelData(newLabel);
@@ -105,7 +100,7 @@ function Labeling () {
       setSampleId(0);
       setLabelData({});
       setCurLabelData("");
-      navigate(`/dataset/${datasetId}`);
+      navigate(`/user/${state.user.name}`);
       return true;
     }
 

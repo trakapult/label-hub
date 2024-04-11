@@ -11,7 +11,7 @@ function ViewDataset () {
   }
   const handleLoad = (dataset) => {
     return (
-      dataset && <ViewDatasetPanel dataset={dataset} buttonText="开始标注" handleClick={handleClick} />
+      dataset && <ViewDatasetPanel dataset={dataset} buttonText="进入标注" handleClick={handleClick} />
     );
   }
 

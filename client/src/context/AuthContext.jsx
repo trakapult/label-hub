@@ -9,8 +9,8 @@ const initialState = {
 const reducer = (state, action) => {
   switch(action.type) {
     case 'LOGIN':
-      console.log("user", action.user);
-      console.log("token", action.token);
+      // console.log("user", action.user);
+      // console.log("token", action.token);
       return {
         isLoggedIn: true,
         user: action.user,

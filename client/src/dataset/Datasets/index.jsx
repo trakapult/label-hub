@@ -7,11 +7,9 @@ function Datasets () {
   const [selections, setSelections] = useState({admin: "", dataType: "", labelType: "", segments: null});
   
   const handleSearch = (e) => {
-    console.log(e.target.search.value);
     setSearch(e.target.search.value);
   }
   const handleSelection = (e) => {
-    console.log(e.target.id, e.target.value);
     setSelections({...selections, [e.target.id]: e.target.value});
   }
 

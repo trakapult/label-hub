@@ -7,7 +7,7 @@ function TextualLabels ({sampleId=0, index=0, curLabel, saveLabel}) {
       textualLabel.value = curLabel || "";
   }, [sampleId]);
   return (
-    <div className="col-md-6 text-center">
+    <div className="text-center">
       <textarea
         className="form-control mb-2"
         id={`textualLabel${index}`}

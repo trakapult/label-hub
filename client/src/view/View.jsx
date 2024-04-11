@@ -45,7 +45,8 @@ function View ({service, params, handleLoad}) {
 
   return (
     <>
-      {content === null ? <Loading /> : handleLoad(content)}
+      {content === null && !error && <Loading />}
+      {content !== null && !error && handleLoad(content)}
       {error && <Error error={error} />}
     </>
   );

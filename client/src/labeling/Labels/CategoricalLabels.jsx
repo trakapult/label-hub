@@ -14,7 +14,7 @@ function CategoricalLabels ({labelInfo, curLabel, saveLabel, formtext=true}) {
           </button>
         ))}
       </div>
-      {formtext && <div className="form-text">可按单个数字键i输入第i个标签</div>}
+      {formtext && <div className="form-text">可按单个数字键1~9输入第1~9个标签</div>}
     </div>
   );
 }

@@ -7,6 +7,7 @@ function Header() {
       <div className="container-fluid">
         <div className="navbar-nav">
             <a className="nav-link active" href="/">LabelHub</a>
+            <a className="nav-link" href="/create">创建数据集</a>
         </div>
         {!state.isLoggedIn && (
           <div className="navbar-nav">
@@ -16,7 +17,7 @@ function Header() {
         )}
         {state.isLoggedIn && (
           <div className="navbar-nav">
-            <a className="nav-link" href={`/user/${state.user.name}`}>个人信息</a>
+            <a className="nav-link" href={`/user/${state.user.name}`}>{state.user.name}</a>
             <a className="nav-link" href="/" onClick={() => dispatch({type: "LOGOUT"})}>注销</a>
           </div>
         )}

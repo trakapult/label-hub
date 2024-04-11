@@ -36,8 +36,8 @@ function Login() {
           <UserForm
             title="登录"
             attrs={[
-              {type: "email", label: "邮箱"},
-              {type: "password", label: "密码"}
+              {type: "email", id: "email", label: "邮箱"},
+              {type: "password", id: "password", label: "密码"}
             ]}
             error={error}
             buttonText={"登录"}

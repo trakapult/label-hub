@@ -30,7 +30,6 @@ function EditDatasetPanel ({dataset}) {
 
   const handleChange = (e) => {
     const labelType = e.target.value;
-    console.log("change", labelType);
     if (labelType === "categorical") {
       setlabelInfoInput(
         <div className="input-group">
@@ -95,10 +94,7 @@ function EditDatasetPanel ({dataset}) {
       formData.append("labelType", labelType);
       formData.append("labelInfo", JSON.stringify(labelInfo));
       formData.append("segments", segments);
-      if (file) {
-        formData.append("file", file);
-      }
-      console.log(formData);
+      if (file) formData.append("file", file);
       let res = null;
       if (dataset) {
         res = await DatasetService.edit(state.token, dataset.id, formData);
@@ -109,7 +105,6 @@ function EditDatasetPanel ({dataset}) {
         setError(res.error);
         return;
       }
-      console.log("done");
       navigate("/dataset/" + res.data.id);
     } catch (err) {
       console.log(err);
@@ -160,7 +155,7 @@ function EditDatasetPanel ({dataset}) {
           <span className="input-group-text">样本</span>
           <input className="form-control" type="file" id="samples" accept=".zip" />
         </div>
-        <div className="form-text text-center mb-3">请上传zip文件，内部结构为{"{0..(n-1)}.ext"}</div>
+        <div className="form-text text-center mb-3">请上传zip文件</div>
         {error && <Error error={error} />}
         <div className="buttons text-center">
           <button className="btn btn-primary" type="submit">创建</button>

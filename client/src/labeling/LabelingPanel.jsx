@@ -45,18 +45,20 @@ function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabe
         </div>
       </div>
       <div className="row justify-content-center mb-3">
-        {labelType === "numerical" &&
-          <NumericalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
-        }
-        {labelType === "categorical" && (
-          <CategoricalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
-        )}
-        {labelType === "textual" && (
-          <form className="row justify-content-center" onSubmit={(e) => {e.preventDefault(); saveLabel(textualLabel); setSaved(true);}}>
-            <TextualLabels sampleId={sampleId} curLabel={curLabel} saveLabel={(e) => {setTextualLabel(e); setSaved(false);}} />
-            <SaveButton saved={saved} />
-          </form>
-        )}
+        <div className="col-md-6">
+          {labelType === "numerical" &&
+            <NumericalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
+          }
+          {labelType === "categorical" && (
+            <CategoricalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
+          )}
+          {labelType === "textual" && (
+            <form className="row justify-content-center" onSubmit={(e) => {e.preventDefault(); saveLabel(textualLabel); setSaved(true);}}>
+              <TextualLabels sampleId={sampleId} curLabel={curLabel} saveLabel={(e) => {setTextualLabel(e); setSaved(false);}} />
+              <SaveButton saved={saved} />
+            </form>
+          )}
+        </div>
       </div>
     </>
   );

@@ -47,7 +47,7 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     setAreas(a);
     fillAreas(a);
     setSaved(curLabelData ? true : false);
-  }, [sampleId, fileInfo]);
+  }, [sampleId, fileInfo, curLabelData]);
 
   useEffect(() => {
     canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
@@ -62,7 +62,6 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     const y = rect.y / canvasHeight * canvas.height;
     const width = rect.width / canvasWidth * canvas.width;
     const height = rect.height / canvasHeight * canvas.height;
-    console.log(canvasWidth, canvasHeight, canvas.width, canvas.height);
     ctx.fillStyle = getColor(index);
     ctx.globalAlpha = 0.5;
     ctx.fillRect(x, y, width, height);
@@ -84,7 +83,6 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
 
   const fillAreas = (a) => {
     if (!canvas || !a) return;
-    console.log("fillAreas", a);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     a.forEach((rect, index) => {
@@ -102,23 +100,19 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setCurArea({x, y, label: ""});
-    console.log("Mouse down, curArea:", {x, y, label: ""});
   };
 
   const handleMouseMove = (e) => {
     if (!curArea) return;
-    console.log("mouse move");
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const width = x - curArea.x;
     const height = y - curArea.y;
     setCurArea({...curArea, width, height});
-    console.log("Mouse move, curArea:", curArea);
   };
 
   const handleMouseUp = () => {
-    console.log("Mouse up, curArea:", curArea);
     if (!curArea) return;
     if (curArea.width < 0) {
       curArea.x += curArea.width;
@@ -176,7 +170,7 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
             />
           </>
         }
-        attrs={["序号", "左上角", "右下角"]}
+        attrs={["左上角", "右下角"]}
         rows={areasToLabelData(areas).map(({x0, y0, x1, y1, label}, index) =>[
           index + 1,
           `(${x0.toFixed(2)}, ${y0.toFixed(2)})`,

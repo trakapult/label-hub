@@ -57,7 +57,6 @@ module.exports = {
         return;
       }
       const sampleNum = new admZip(fs.readFileSync(file.path)).getEntries().length;
-      console.log(name, admin, description, sampleNum, dataType, labelType, labelInfo, segments);
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
@@ -89,7 +88,6 @@ module.exports = {
       }
       const file = req.file;
       const sampleNum = file ? new admZip(fs.readFileSync(file.path)).getEntries().length : dataset.sampleNum;
-      console.log(name, description, sampleNum, dataType, labelType, labelInfo, segments);
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
@@ -125,15 +123,14 @@ module.exports = {
       res.status(400).send({error: "删除数据集时发生错误"});
     }
   },
-  async index (req, res) {
+  async showAll (req, res) {
     try {
       let datasets = null;
       const search = req.query.search;
       const admin = req.query.admin;
       const dataType = req.query.dataType;
       const labelType = req.query.labelType;
-      const segments = req.query.segments === "true" ? true : req.query.segments === "false" ? false : null;
-      console.log(admin, dataType, labelType, segments);
+      const segments = req.query.segments === "yes" ? true : req.query.segments === "no" ? false : null;
       datasets = await Dataset.findAll({
         where: {
           [Op.and]: [
@@ -159,7 +156,6 @@ module.exports = {
   async show (req, res) {
     try {
       const dataset = await Dataset.findByPk(req.params.datasetId);
-      console.log(req.params.datasetId, dataset);
       res.send(dataset);
     } catch(err) {
       console.log(err);
@@ -173,7 +169,6 @@ module.exports = {
       extractZip(path);
       const name = fs.readdirSync(path).find((name) => name.startsWith(req.params.sampleId + "."));
       const file = fs.readFileSync(`${path}/${name}`, dataset.dataType === "text" ? "utf-8" : "binary");
-      console.log(file.length);
       let fileInfo = null;
       if (dataset.dataType === "text") {
         fileInfo = {length: file.length};
@@ -190,7 +185,6 @@ module.exports = {
           });
         };
         const duration = await getDuration(`${path}/${name}`);
-        console.log("duration", duration);
         fileInfo = {duration};
       }
       res.send({file, fileInfo});

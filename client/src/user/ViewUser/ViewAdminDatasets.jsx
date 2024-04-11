@@ -13,7 +13,9 @@ function ViewAdminDatasets ({name}) {
         <h4 className="card-subtitle mb-4">
           管理的数据集
           {sameUser && (
-            <a className="btn btn-primary float-end" href="/create">新建数据集</a>
+            <div className="d-flex float-end gap-2">
+              <a className="btn btn-primary" href="/create">新建数据集</a>
+            </div>
           )}
         </h4>
         <div className="col-md-12 overflow-auto" style={{maxHeight: "500px"}}>

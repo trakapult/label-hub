@@ -7,7 +7,7 @@ function UserForm({title, attrs, error, buttonText, handleSubmit}) {
         <h2 className="card-title mb-5">{title}</h2>
         {attrs.map((attr, index) =>
           <div className="form-floating mb-3" key={index}>
-            <input className="form-control" type={attr.type} id={attr.type} placeholder="" required />
+            <input className="form-control" type={attr.type} id={attr.id} placeholder="" required />
             <label htmlFor={attr.type}>{attr.label}</label>
             {attr.message && <div className="form-text">{attr.message}</div>}
           </div>

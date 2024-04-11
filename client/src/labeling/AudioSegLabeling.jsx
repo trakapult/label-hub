@@ -57,7 +57,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
     if (!canvas || !labelData || !audioRef) return [];
     const duration = fileInfo.duration;
     const canvasWidth = canvas.getBoundingClientRect().width;
-    console.log("duration canvasWidth", duration, canvasWidth);
     const segments = labelData.map(({start, end, label}) => ({
       start: start / duration * canvasWidth + margin,
       end: end / duration * canvasWidth + margin,
@@ -70,7 +69,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
     if (!canvas || !audioRef) return [];
     const duration = fileInfo.duration;
     const canvasWidth = canvas.getBoundingClientRect().width;
-    console.log("duration canvasWidth", duration, canvasWidth);
     const labelData = segments.map(({start, end, label}) => ({
       start: (start - margin) / canvasWidth * duration,
       end: (end - margin) / canvasWidth * duration,
@@ -88,7 +86,7 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
     setSegments(s);
     fillSegments(s);
     setSaved(curLabelData ? true : false);
-  }, [sampleId, fileInfo]);
+  }, [sampleId, fileInfo, curLabelData]);
 
   useEffect(() => {
     canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
@@ -110,7 +108,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
   }, 50);
 
   const fill = (ctx, intv, index) => {
-    console.log("fill", intv, index);
     const {start, end} = intv;
     const canvasHeight = canvas.getBoundingClientRect().height;
     ctx.fillStyle = getColor(index);
@@ -132,7 +129,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
 
   const fillSegments = (s) => {
     if (!canvas) return;
-    console.log("fillSegments", s);
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     s.forEach((intv, index) => {
@@ -167,8 +163,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
       curSegment.start = curSegment.end;
       curSegment.end = temp;
     }
-    console.log("Mouse up, curSegment:", curSegment);
-    console.log("converted segments:", segmentsToLabelData([...segments, curSegment]));
     if (curSegment.end - curSegment.start > 0)
       setSegments([...segments, curSegment]);
     setCurSegment(null);
@@ -182,7 +176,6 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
     }
     const container = containerRef.current;
     const left = container.getBoundingClientRect().left, right = container.getBoundingClientRect().right;
-    console.log("mouse leave", left, right, e.clientX);
     mouseLeaveInterval = setInterval(() => {
       if (e.clientX < left + margin) {
         container.scrollLeft -= 10;
@@ -196,9 +189,7 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
   }
 
   const handleMouseOver = () => {
-    console.log("mouse over", mouseLeaveInterval);
     if (mouseLeaveInterval) {
-      console.log("clear mouse leave interval");
       clearInterval(mouseLeaveInterval);
       mouseLeaveInterval = null;
     }
@@ -234,7 +225,7 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
             <div
               className="audio-container"
               ref={containerRef}
-              onMouseDown={() => {console.log(doScroll); doScroll = false;}}
+              onMouseDown={() => {doScroll = false;}}
             >
               <canvas className="audio-canvas" ref={waveRef} height={canvasHeight} />
               <div
@@ -266,7 +257,7 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
             </audio>
           </>
         }
-        attrs={["序号", "区间"]}
+        attrs={["区间"]}
         rows={
           segmentsToLabelData(segments).map((s, index) =>[
             index + 1,

@@ -14,6 +14,11 @@ function Register() {
       const name = e.target.name.value;
       const email = e.target.email.value;
       const password = e.target.password.value;
+      const confirmPassword = e.target.confirmPassword.value;
+      if (password !== confirmPassword) {
+        setError("两次输入的密码不一致");
+        return;
+      }
       const res = await AuthService.register({name, email, password});
       if (res.error) {
         setError(res.error);
@@ -38,9 +43,10 @@ function Register() {
           <UserForm
             title="注册"
             attrs={[
-              {type: "name", label: "用户名", message: "用户名应为3-16个字符，且只能包含字母和数字"},
-              {type: "email", label: "邮箱", message: "请输入有效的邮箱地址"},
-              {type: "password", label: "密码", message: "密码应为8-32个字符，且只能包含字母和数字"}
+              {type: "name", id: "name", label: "用户名", message: "用户名应为3-16个字符，且只能包含字母和数字"},
+              {type: "email", id: "email", label: "邮箱", message: "user@example.com"},
+              {type: "password", id: "password", label: "密码", message: "密码应为8-32个字符，且只能包含字母和数字"},
+              {type: "password", id: "confirmPassword", label: "确认密码", message: "请再次输入密码"}
             ]}
             error={error}
             buttonText={"注册"}

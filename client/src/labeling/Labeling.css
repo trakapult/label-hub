@@ -1,3 +1,9 @@
+.annotation {
+  position: absolute;
+  top: 9px;
+  user-select: none;
+}
+
 .img-container {
   position: relative;
   margin: 20px auto;

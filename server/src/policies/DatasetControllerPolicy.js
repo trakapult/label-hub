@@ -23,7 +23,6 @@ module.exports = {
       }
     }
     if (error) {
-      console.log(req.body);
       console.log(error);
       res.status(400).send({error: "数据集信息不完整或格式错误"});
     } else {
