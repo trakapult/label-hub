@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import UserForm from "./UserForm";
 import AuthService from "./AuthService";
 
@@ -13,10 +13,6 @@ function Login() {
     try {
       const email = e.target.email.value, password = e.target.password.value;
       const res = await AuthService.login({email, password});
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
       dispatch({type: "LOGIN", token: res.data.token, user: res.data.user});
       navigate("/");
     } catch (err) {

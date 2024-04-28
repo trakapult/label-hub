@@ -7,7 +7,13 @@ module.exports = (sequelize, DataTypes) => {
     sampleNum: DataTypes.INTEGER,
     labelType: DataTypes.STRING,
     labelInfo: DataTypes.JSON,
-    segments: DataTypes.BOOLEAN
+    segments: DataTypes.BOOLEAN,
+    publicized: DataTypes.BOOLEAN,
+    reward: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      validate: {min: 0}
+    },
   }, {
     uniqueKeys: {
       dataset_unique: {

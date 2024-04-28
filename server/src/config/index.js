@@ -8,12 +8,17 @@ module.exports = {
     user: process.env.DB_USER || projectName,
     password: process.env.DB_PASS || projectName,
     options: {
-        dialect: process.env.DIALECT || "sqlite",
-        host: process.env.HOST || "localhost",
-        storage: path.resolve(__dirname, `../../${projectName}.sqlite`),
+      dialect: process.env.DIALECT || "sqlite",
+      host: process.env.HOST || "localhost",
+      storage: path.resolve(__dirname, `../../${projectName}.sqlite`),
     }
   },
   auth: {
     jwtSecret: process.env.JWT_SECRET || "secret"
+  },
+  points: {
+    initial: 1000,
+    noSegments: 1,
+    segments: 2
   }
 };

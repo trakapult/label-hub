@@ -1,5 +1,6 @@
 const Promise = require("bluebird");
 const bcrypt = Promise.promisifyAll(require("bcrypt-nodejs"));
+const config = require("../config");
 
 function hashPassword (user, options) {
   const SALT_FACTOR = 8;
@@ -22,7 +23,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       unique: true
     },
-    password: DataTypes.STRING
+    password: DataTypes.STRING,
+    points: {
+      type: DataTypes.INTEGER,
+      defaultValue: config.points.initial,
+      validate: {min: 0}
+    }
   }, {
     hooks: {
       // beforeCreate: hashPassword,

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../context/AuthContext";
-import Error from "../../common/Error";
+import { useAuthContext } from "@/context/AuthContext";
+import Error from "@/common/Error";
 import DatasetService from "../DatasetService";
 
 function EditDatasetPanel ({dataset}) {
@@ -85,6 +85,7 @@ function EditDatasetPanel ({dataset}) {
         labelInfo = categories.split(",");
       }
       const segments = e.target.segments.checked;
+      const publicized = e.target.publicized.checked;
       const file = e.target.samples.files[0];
       const formData = new FormData();
       formData.append("name", name);
@@ -94,16 +95,13 @@ function EditDatasetPanel ({dataset}) {
       formData.append("labelType", labelType);
       formData.append("labelInfo", JSON.stringify(labelInfo));
       formData.append("segments", segments);
+      formData.append("publicized", publicized);
       if (file) formData.append("file", file);
       let res = null;
       if (dataset) {
         res = await DatasetService.edit(state.token, dataset.id, formData);
       } else {
         res = await DatasetService.create(state.token, formData);
-      }
-      if (res.error) {
-        setError(res.error);
-        return;
       }
       navigate("/dataset/" + res.data.id);
     } catch (err) {
@@ -125,17 +123,17 @@ function EditDatasetPanel ({dataset}) {
           <textarea className="form-control" id="description" required style={{height: "150px"}} />
         </div>
         <div className="row align-items-center mb-3">
-          <div className="col-md-3">
+          <div className="col-md-2">
             <select className="form-select" id="dataType" required>
-              <option value="">选择数据类型</option>
+              <option value="">数据：</option>
               <option value="text">文本</option>
               <option value="image">图像</option>
               <option value="audio">音频</option>
             </select>
           </div>
-          <div className="col-md-3">
+          <div className="col-md-2">
             <select className="form-select" id="labelType" required onChange={handleChange}>
-              <option value="">选择标注类型</option>
+              <option value="">标注：</option>
               <option value="numerical">数值</option>
               <option value="categorical">分类</option>
               <option value="textual">文本</option>
@@ -148,6 +146,12 @@ function EditDatasetPanel ({dataset}) {
             <div className="form-check form-switch">
               <input className="form-check-input" type="checkbox" id="segments" />
               <label className="form-check-label" htmlFor="segments">分段</label>
+            </div>
+          </div>
+          <div className="col-md-2">
+            <div className="form-check form-switch">
+              <input className="form-check-input" type="checkbox" id="publicized" />
+              <label className="form-check-label" htmlFor="publicized">公开</label>
             </div>
           </div>
         </div>

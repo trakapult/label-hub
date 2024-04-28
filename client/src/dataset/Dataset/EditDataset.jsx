@@ -1,8 +1,8 @@
-import { useAuthContext } from "../../context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import { useParams } from 'react-router-dom';
-import View from "../../view/View";
+import View from "@/view/View";
 import EditDatasetPanel from "./EditDatasetPanel";
-import Error from "../../common/Error";
+import Error from "@/common/Error";
 import DatasetService from "../DatasetService";
 
 function EditDataset () {

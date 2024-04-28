@@ -1,40 +1,41 @@
-import { useParams, useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../context/AuthContext";
-import View from "../../view/View";
-import ViewDatasetPanel from "./ViewDatasetPanel";
-import Error from "../../common/Error";
+import { useState } from "react";
+import { useAuthContext } from "@/context/AuthContext";
+import { useNavigate } from "react-router-dom";
 import DatasetService from "../DatasetService";
+import Error from "@/common/Error";
 
-function DeleteDataset () {
-  const datasetId = useParams().datasetId;
+function DeleteDataset ({dataset}) {
   const navigate = useNavigate();
   const {state} = useAuthContext();
-  const handleLoad = (dataset) => {
-    const error = state.user.name === dataset.admin ? "" : "您无权删除此数据集";
-    const handleClick = async (dataset) => {
-      try {
-        const res = await DatasetService.delete(state.token, dataset.id);
-        if (res.error) {
-          return;
-        }
-        navigate(`/user/${state.user.name}`);
-      } catch (err) {
-        console.log(err);
+  const sameUser = state.user.name === dataset.admin;
+  const [error, setError] = useState(sameUser ? "" : "您无权删除此数据集");
+  const handleDelete = async (e) => {
+    try {
+      if (e.target.name.value !== dataset.name) {
+        setError("数据集名称不匹配");
+        return;
       }
+      await DatasetService.delete(state.token, dataset.id);
+      navigate(`/user/${state.user.name}`);
+    } catch (err) {
+      console.log(err);
+      setError(err.response.data.error);
     }
-    
-    return (
-      <>
-        {error && <Error error={error} />}
-        {dataset && !error && <ViewDatasetPanel dataset={dataset} buttonText="确认删除" handleClick={handleClick} />}
-      </>
-    );
   }
 
   return (
-    <div className="container pt-5">
-      <View service={DatasetService.get} params={[datasetId]} handleLoad={handleLoad} />
-    </div>
+    <>
+      {sameUser && (
+        <form className="text-center mb-3" onSubmit={(e) => {e.preventDefault(); handleDelete(e);}}>
+          <h5>请键入数据集名称并点击“确认删除”</h5>
+          <input  className="form-control mt-3" type="text" id="name" placeholder={dataset.name} />
+          <button className="btn btn-danger mt-3">确认删除</button>
+        </form>
+      )}
+      {(!sameUser || error) && (
+        <Error error={error} />
+      )}
+    </>
   );
 }
 

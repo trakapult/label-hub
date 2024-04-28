@@ -1,16 +1,17 @@
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import Datasets from "@/dataset/Datasets";
+import Users from "@/user/Users";
 
 function Home() {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate("/datasets");
-  }, [navigate]);
-  
   return (
     <div className="container pt-5">
-      <h1>Home</h1>
+      <div className="row">
+        <div className="col-md-9">
+          <Datasets />
+        </div>
+        <div className="col-md-3">
+          <Users />
+        </div>
+      </div>
     </div>
   );
 }

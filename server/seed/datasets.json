@@ -7,7 +7,8 @@
     "dataType": "text",
     "labelType": "numerical",
     "labelInfo": {"min": 1, "max": 5},
-    "segments": false
+    "segments": false,
+    "publicized": true
   },
   {
     "name": "Cat or Dog",
@@ -17,7 +18,8 @@
     "dataType": "image",
     "labelType": "categorical",
     "labelInfo": ["猫", "狗", "其他"],
-    "segments": false
+    "segments": false,
+    "publicized": true
   },
   {
     "name": "Speech To Text",
@@ -26,7 +28,8 @@
     "sampleNum": 6,
     "dataType": "audio",
     "labelType": "textual",
-    "segments": false
+    "segments": false,
+    "publicized": false
   },
   {
     "name": "作文评分",
@@ -36,7 +39,8 @@
     "dataType": "text",
     "labelType": "numerical",
     "labelInfo": {"min": 1, "max": 5},
-    "segments": true
+    "segments": true,
+    "publicized": false
   },
   {
     "name": "年龄段标注",
@@ -46,7 +50,8 @@
     "dataType": "image",
     "labelType": "categorical",
     "labelInfo": ["儿童", "少年", "青年", "中年", "老年"],
-    "segments": true
+    "segments": true,
+    "publicized": true
   },
   {
     "name": "分段语音标注",
@@ -55,6 +60,7 @@
     "sampleNum": 5,
     "dataType": "audio",
     "labelType": "textual",
-    "segments": true
+    "segments": true,
+    "publicized": true
   }
 ]

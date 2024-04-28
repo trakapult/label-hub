@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuthContext } from "../context/AuthContext";
-import View from "../view/View";
-import Error from "../common/Error";
+import { useAuthContext } from "@/context/AuthContext";
+import View from "@/view/View";
+import Error from "@/common/Error";
 import LabelingPanel from "./LabelingPanel";
 import SegLabeling from "./SegLabeling";
-import DatasetService from "../dataset/DatasetService";
+import DatasetService from "@/dataset/DatasetService";
 import LabelService from "./LabelService";
 import "./Labeling.css";
 
@@ -23,20 +23,12 @@ function Labeling () {
     if (!state.isLoggedIn) return;
     const loadLabelData = async () => {
       let res = await LabelService.get(state.token, datasetId, state.user.name);
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
-      const {label, labeledNum} = res.data;
+      const {label} = res.data;
       if (!label) return;
       res = await LabelService.getLabelData(state.token, datasetId, state.user.name);
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
       const labelData = res.data;
       setLabelData(labelData);
-      const id = Math.max(0, labeledNum - 1);
+      const id = Math.max(0, label.labeledNum - 1);
       setSampleId(id);
       setCurLabelData(labelData[id] || "");
     }
@@ -91,17 +83,18 @@ function Labeling () {
     }
   
     const upload = async () => {
-      const res = await LabelService.create(state.token, datasetId, state.user.name, labelData);
-      if (res.error) {
-        console.error(res.error);
-        setError(res.error);
+      try {
+        const res = await LabelService.create(state.token, datasetId, state.user.name, labelData);
+        setSampleId(0);
+        setLabelData({});
+        setCurLabelData("");
+        navigate(`/user/${state.user.name}`);
+        return true;
+      } catch (err) {
+        console.log(err);
+        setError(err.response.data.error);
         return false;
       }
-      setSampleId(0);
-      setLabelData({});
-      setCurLabelData("");
-      navigate(`/user/${state.user.name}`);
-      return true;
     }
 
     const handleSampleLoad = ({file, fileInfo}) => {
@@ -136,7 +129,7 @@ function Labeling () {
           <div className="col-md-6">
             <div className="progress mb-3">
               <div
-                className="progress-bar"
+                className="progress-bar bg-success"
                 style={{width: `${(sampleId + 1) / dataset.sampleNum * 100}%`}}
               >
                 {sampleId + 1}/{dataset.sampleNum}

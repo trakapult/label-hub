@@ -1,7 +1,10 @@
-import api from "../api";
+import api from "@/api";
 
 export default {
-  get (token, userName) {
-    return api(token).get("user/" + userName);
+  getAll (token, search) {
+    return api(token).get(`users?search=${search}`);
+  },
+  get (token, name) {
+    return api(token).get("user/" + name);
   }
 };

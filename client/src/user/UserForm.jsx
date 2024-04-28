@@ -1,4 +1,4 @@
-import Error from "../common/Error";
+import Error from "@/common/Error";
 
 function UserForm({title, attrs, error, buttonText, handleSubmit}) {
   return (

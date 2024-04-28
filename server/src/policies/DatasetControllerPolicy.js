@@ -13,7 +13,8 @@ module.exports = {
         Joi.string().pattern(new RegExp("^\\[\"[^\"]+\"(,\"[^\"]+\")*\\]$")).required(),
         "null"
       ).required(),
-      segments: Joi.boolean().required()
+      segments: Joi.boolean().required(),
+      publicized: Joi.boolean().required()
     });
     let {error} = schema.validate(req.body);
     if (req.body.labelType === "numerical" && !error) {
@@ -24,7 +25,11 @@ module.exports = {
     }
     if (error) {
       console.log(error);
-      res.status(400).send({error: "数据集信息不完整或格式错误"});
+      if (typeof error === "string") {
+        res.status(400).send({error});
+      } else {
+        res.status(400).send({error: error.details[0].message});
+      }
     } else {
       next();
     }

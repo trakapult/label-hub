@@ -4,19 +4,31 @@ const fs = require("fs");
 module.exports = {
   async create (req, res) {
     try {
-      const {datasetId, labeler} = req.params;
+      const {datasetId, labeler, labels} = req.body;
       if (req.user.name !== labeler) {
         res.status(403).send({error: "您无权上传此标注"});
         return;
       }
       const path = `./data/labels/${datasetId}/`;
       if (!fs.existsSync(path)) fs.mkdirSync(path);
-      const labels = req.body;
       fs.writeFileSync(path + `${labeler}.json`, JSON.stringify(labels));
-      let labeledNum = Object.keys(labels).length;
-      fs.writeFileSync(path + `${labeler}.labeledNum`, labeledNum.toString());
+      const labeledNum = Object.keys(labels).length;
       let label = await Label.findOne({where: {datasetId, labeler}});
-      if (!label) label = await Label.create({datasetId, labeler});
+      const dataset = await Dataset.findByPk(datasetId);
+      if (!label) {
+        await User.update(
+          {points: User.sequelize.literal(`points + ${dataset.reward * labeledNum}`)},
+          {where: {name: labeler}}
+        );
+        label = await Label.create({datasetId, labeler, labeledNum});
+      } else {
+        await User.update(
+          {points: User.sequelize.literal(`points + ${dataset.reward * (labeledNum - label.labeledNum)}`)},
+          {where: {name: labeler}}
+        );
+        label.labeledNum = labeledNum;
+        await label.save();
+      }
       res.send(label);
     }
     catch(err) {
@@ -32,12 +44,7 @@ module.exports = {
         return;
       }
       const label = await Label.findOne({where: {datasetId, labeler}});
-      if (!label) {
-        res.send({label: null, labeledNum: 0});
-        return;
-      }
-      const labeledNum = parseInt(fs.readFileSync(`./data/labels/${datasetId}/${labeler}.labeledNum`));
-      res.send({label, labeledNum});
+      res.send(label);
     } catch(err) {
       console.log(err);
       res.status(400).send({error: "获取标注时发生错误"});
@@ -50,13 +57,12 @@ module.exports = {
         res.status(403).send({error: "您无权访问这些数据集"});
         return;
       }
-      const labels = await Label.findAll({where: {labeler}, order: [["updatedAt", "DESC"]]});
-      const datasets = await Promise.all(labels.map(async label => {
-        const dataset = await Dataset.findByPk(label.datasetId);
-        const labeledNum = parseInt(fs.readFileSync(`./data/labels/${label.datasetId}/${label.labeler}.labeledNum`));
-        return {dataset, labeledNum};
-      }));
-      res.send(datasets);
+      const labels = await Label.findAll({
+        where: {labeler},
+        order: [["updatedAt", "DESC"]],
+        include: [{model: Dataset, as: "dataset"}]
+      });
+      res.send(labels);
     } catch(err) {
       console.log(err);
       res.status(400).send({error: "获取数据集时发生错误"});
@@ -66,16 +72,12 @@ module.exports = {
     try {
       const {datasetId} = req.params;
       const dataset = await Dataset.findByPk(datasetId);
-      if (req.user.name !== dataset.admin) {
+      if (!dataset.publicized && req.user.name !== dataset.admin) {
         res.status(403).send({error: "您无权访问这些标注记录"});
         return;
       }
       const labels = await Label.findAll({where: {datasetId}});
-      const records = await Promise.all(labels.map(async label => {
-        const labeledNum = parseInt(fs.readFileSync(`./data/labels/${label.datasetId}/${label.labeler}.labeledNum`));
-        return {label, labeledNum};
-      }));
-      res.send(records);
+      res.send(labels);
     } catch(err) {
       console.log(err);
       res.status(400).send({error: "获取标注者时发生错误"});
@@ -85,7 +87,7 @@ module.exports = {
     try {
       const {datasetId, labeler} = req.params;
       const dataset = await Dataset.findByPk(datasetId);
-      if (req.user.name !== dataset.admin && req.user.name !== labeler) {
+      if (!dataset.publicized && req.user.name !== dataset.admin && req.user.name !== labeler) {
         res.status(403).send({error: "您无权访问此标注记录"});
         return;
       }

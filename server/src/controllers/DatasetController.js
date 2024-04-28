@@ -24,9 +24,7 @@ const saveZip = (path, file) => {
 };
 
 const extractZip = (path) => {
-  if (fs.existsSync(path)) {
-    return;
-  }
+  if (fs.existsSync(path)) return;
   const zipFile = new admZip(fs.readFileSync(path + ".zip"));
   const zipEntries = zipFile.getEntries();
   zipEntries.forEach((zipEntry) => {
@@ -46,7 +44,7 @@ const removeFiles = (path) => {
 module.exports = {
   async create (req, res) {
     try {
-      const {name, admin, description, dataType, labelType, labelInfo, segments} = req.body;
+      const {name, admin, description, dataType, labelType, labelInfo, segments, publicized} = req.body;
       const file = req.file;
       if (req.user.name !== admin) {
         res.status(403).send({error: "您无权创建此数据集"});
@@ -61,7 +59,7 @@ module.exports = {
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
-      const dataset = await Dataset.create({name, admin, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments});
+      const dataset = await Dataset.create({name, admin, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments, publicized});
       const path = `./data/datasets/${dataset.id}`;
       if (!saveZip(path, file)) {
         await dataset.destroy();
@@ -69,6 +67,12 @@ module.exports = {
         return;
       }
       res.send(dataset);
+      /*if (publicized) {
+        const user = await User.findOne({where: {name: admin}});
+        const num = segments ? config.points.segments : config.points.noSegments;
+        await user.update({points: user.points + num * sampleNum});
+      }*/
+      // TODO: 为确保不同文件多次交，且数据集有标注，需等所有样本至少有一个标注以后再发放积分
     } catch(err) {
       console.log(err);
       if (err.name === "SequelizeUniqueConstraintError") {
@@ -126,11 +130,9 @@ module.exports = {
   async showAll (req, res) {
     try {
       let datasets = null;
-      const search = req.query.search;
-      const admin = req.query.admin;
-      const dataType = req.query.dataType;
-      const labelType = req.query.labelType;
+      const {search, admin, dataType, labelType} = req.query;
       const segments = req.query.segments === "yes" ? true : req.query.segments === "no" ? false : null;
+      const publicized = req.query.publicized === "yes" ? true : req.query.publicized === "no" ? false : null;
       datasets = await Dataset.findAll({
         where: {
           [Op.and]: [
@@ -142,10 +144,12 @@ module.exports = {
             admin && {admin},
             dataType && {dataType},
             labelType && {labelType},
-            segments !== null && {segments}
+            segments !== null && {segments},
+            publicized !== null && {publicized}
           ]
         },
-        order: [["createdAt", "DESC"]]
+        order: [["createdAt", "DESC"]],
+        limit: 100
       });
       res.send(datasets);
     } catch(err) {

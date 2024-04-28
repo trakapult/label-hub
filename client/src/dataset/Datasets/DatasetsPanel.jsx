@@ -1,4 +1,4 @@
-import View from "../../view/View";
+import View from "@/view/View";
 import DatasetService from "../DatasetService";
 import DatasetCard from "../Dataset/DatasetCard";
 
@@ -24,7 +24,7 @@ function DatasetsPanel ({search, selections}) {
   };
 
   return (
-    <View service={DatasetService.getAll} params={[search, selections]} handleLoad={handleLoad} />
+    <View service={DatasetService.getAll} params={[search, selections]} handleLoad={handleLoad} checkLogin={false} />
   );
 }
 

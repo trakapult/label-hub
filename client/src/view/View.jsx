@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useAuthContext } from "../context/AuthContext";
-import Loading from "../common/Loading";
-import Error from "../common/Error";
+import { useAuthContext } from "@/context/AuthContext";
+import Loading from "@/common/Loading";
+import Error from "@/common/Error";
 
-function View ({service, params, handleLoad}) {
+function View ({service, params, handleLoad, checkLogin=true}) {
   const [content, setContent] = useState(null);
   const [error, setError] = useState("");
   const {state} = useAuthContext();
@@ -11,10 +11,6 @@ function View ({service, params, handleLoad}) {
   const get = async () => {
     try {
       const res = await service(state.token, ...params);
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
       setContent(res.data);
       setError("");
     } catch (err) {
@@ -24,20 +20,15 @@ function View ({service, params, handleLoad}) {
   }
 
   useEffect(() => {
-    if (state.isLoggedIn) {
+    if (!checkLogin || state.isLoggedIn) {
       get();
     }
   }, [state, params]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (content) {
-        return;
-      }
-      if (!state.isLoggedIn) {
+      if (checkLogin && !state.isLoggedIn) {
         setError("请先注册或登录");
-      } else if (error !== "") {
-        setError("加载时出现错误");
       }
     }, 1000);
     return () => clearTimeout(timer);

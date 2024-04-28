@@ -1,13 +1,13 @@
-import { useAuthContext } from "../../context/AuthContext";
-import View from "../../view/View";
-import LabelService from "../../labeling/LabelService";
-import Icons from "../../dataset/Icons";
+import { useAuthContext } from "@/context/AuthContext";
+import View from "@/view/View";
+import LabelService from "@/labeling/LabelService";
+import Icons from "@/dataset/Icons";
 
 function ViewLabeledDatasets ({name}) {
   const {state} = useAuthContext();
   const sameUser = state.user.name === name;
   if (!sameUser) return null;
-  const handleLoad = (datasets) => {
+  const handleLoad = (labels) => {
     return (
       <>
         <h4 className="card-subtitle mb-4">
@@ -20,21 +20,25 @@ function ViewLabeledDatasets ({name}) {
                 <th>名称</th>
                 <th>类型</th>
                 <th>进度</th>
-                <th>操作</th>
               </tr>
             </thead>
             <tbody>
-              {datasets.map(({dataset, labeledNum}) => (
-                <tr key={dataset.id}>
-                  <td>{dataset.name}</td>
+              {labels.map((label) => (
+                <tr key={label.dataset.id}>
+                  <td>{label.dataset.name}</td>
                   <td>
                     <div className="d-flex justify-content-center">
-                      <Icons dataType={dataset.dataType} labelType={dataset.labelType} segments={dataset.segments} />
+                      <Icons
+                        dataType={label.dataset.dataType}
+                        labelType={label.dataset.labelType}
+                        segments={label.dataset.segments}
+                        publicized={label.dataset.publicized}
+                      />
                     </div>
                   </td>
-                  <td>{labeledNum} / {dataset.sampleNum}</td>
+                  <td>{label.labeledNum} / {label.dataset.sampleNum}</td>
                   <td>
-                    <a className="btn btn-primary" href={`/labeling/${dataset.id}`}>继续标注</a>
+                    <a className="btn btn-primary" href={`/dataset/${label.dataset.id}`}>查看</a>
                   </td>
                 </tr>
               ))}

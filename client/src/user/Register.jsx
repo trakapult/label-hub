@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import UserForm from "./UserForm";
-import { useAuthContext } from "../context/AuthContext";
+import { useAuthContext } from "@/context/AuthContext";
 import AuthService from "./AuthService";
 
 function Register() {
@@ -20,10 +20,6 @@ function Register() {
         return;
       }
       const res = await AuthService.register({name, email, password});
-      if (res.error) {
-        setError(res.error);
-        return;
-      }
       dispatch({type: "LOGIN", token: res.data.token, user: res.data.user});
       navigate("/");
     } catch (err) {

@@ -11,8 +11,8 @@ export default {
     return api(token).delete(`dataset/${datasetId}`);
   },
   getAll (token, search, selections) {
-    const {admin, dataType, labelType, segments} = selections;
-    return api(token).get(`datasets?search=${search}&admin=${admin}&dataType=${dataType}&labelType=${labelType}&segments=${segments}`);
+    const {admin, dataType, labelType, segments, publicized} = selections;
+    return api(token).get(`datasets?search=${search}&admin=${admin}&dataType=${dataType}&labelType=${labelType}&segments=${segments}&publicized=${publicized}`);
   },
   get (token, datasetId) {
     return api(token).get(`dataset/${datasetId}`);

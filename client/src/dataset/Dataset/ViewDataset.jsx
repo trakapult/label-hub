@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import View from "../../view/View";
+import View from "@/view/View";
 import ViewDatasetPanel from "./ViewDatasetPanel";
 import DatasetService from "../DatasetService";
 
@@ -17,7 +17,7 @@ function ViewDataset () {
 
   return (
     <div className="container pt-5">
-      <View service={DatasetService.get} params={[datasetId]} handleLoad={handleLoad} />
+      <View service={DatasetService.get} params={[datasetId]} handleLoad={handleLoad} checkLogin={false} />
     </div>
   );
 }
