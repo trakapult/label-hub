@@ -32,7 +32,7 @@ function ViewAdminDatasets ({name}) {
                   <td>{dataset.name}</td>
                   <td>
                     <div className="d-flex justify-content-center">
-                      <Icons dataType={dataset.dataType} labelType={dataset.labelType} segments={dataset.segments} publicized={dataset.publicized} />
+                      <Icons type={dataset.type} dataType={dataset.dataType} labelType={dataset.labelType} segments={dataset.segments} />
                     </div>
                   </td>
                   <td>{new Date(dataset.createdAt).toLocaleString()}</td>
@@ -51,7 +51,7 @@ function ViewAdminDatasets ({name}) {
   return (
     <View
       service={DatasetService.getAll}
-      params={["", {admin: name, dataType: "", labelType: "", segments: null}]}
+      params={["", {admin: name, type: "", dataType: "", labelType: "", segments: null}]}
       handleLoad={handleLoad}
       checkLogin={false}
     />

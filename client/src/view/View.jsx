@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import Loading from "@/common/Loading";
 import Error from "@/common/Error";
@@ -14,7 +14,7 @@ function View ({service, params, handleLoad, checkLogin=true}) {
       setContent(res.data);
       setError("");
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError(err.response.data.error);
     }
   }
@@ -23,7 +23,7 @@ function View ({service, params, handleLoad, checkLogin=true}) {
     if (!checkLogin || state.isLoggedIn) {
       get();
     }
-  }, [state, params]);
+  }, [checkLogin, state, params]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -32,7 +32,7 @@ function View ({service, params, handleLoad, checkLogin=true}) {
       }
     }, 1000);
     return () => clearTimeout(timer);
-  }, [content]);
+  }, [checkLogin, state.isLoggedIn]);
 
   return (
     <>

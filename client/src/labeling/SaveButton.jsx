@@ -18,9 +18,9 @@ function SaveButton ({saved}) {
         className={"btn " + (saved ? "  btn-success" : " btn-primary")}
         type="submit"
         id="save">
-          保存
+          保存并继续
       </button>
-      <div className="form-text">可按Ctrl+Enter保存</div>
+      <div className="form-text">可按Ctrl+Enter保存并继续</div>
     </div>
   );
 }

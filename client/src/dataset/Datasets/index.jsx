@@ -4,8 +4,7 @@ import DatasetsSearchPanel from "./DatasetsSearchPanel";
 
 function Datasets () {
   const [search, setSearch] = useState("");
-  const [selections, setSelections] = useState({admin: "", dataType: "", labelType: "", segments: null});
-
+  const [selections, setSelections] = useState({admin: "", type: "", dataType: "", labelType: "", segments: null});
   return (
     <>
       <DatasetsSearchPanel

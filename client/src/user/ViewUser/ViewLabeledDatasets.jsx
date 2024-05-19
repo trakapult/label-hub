@@ -29,10 +29,10 @@ function ViewLabeledDatasets ({name}) {
                   <td>
                     <div className="d-flex justify-content-center">
                       <Icons
+                        type={label.dataset.type}
                         dataType={label.dataset.dataType}
                         labelType={label.dataset.labelType}
                         segments={label.dataset.segments}
-                        publicized={label.dataset.publicized}
                       />
                     </div>
                   </td>

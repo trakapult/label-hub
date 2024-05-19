@@ -40,7 +40,7 @@ function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabe
           <div className="img-container">
             {dataType === "text" && <p>{file}</p>}
             {dataType === "image" && <img src={`data:image;base64,${btoa(file)}`} alt="sample" />}
-            {dataType === "audio" && <audio src={`data:audio/mp3;base64,${btoa(file)}`} controls />}
+            {dataType === "audio" && <audio src={`data:audio/wav;base64,${btoa(file)}`} controls />}
           </div>
         </div>
       </div>

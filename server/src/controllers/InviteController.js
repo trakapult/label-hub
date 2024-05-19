@@ -14,7 +14,7 @@ module.exports = {
       res.send(invite);
     }
     catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "发送邀请时发生错误"});
     }
   },
@@ -31,7 +31,7 @@ module.exports = {
       });
       res.send(invites);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取邀请时发生错误"});
     }
   },
@@ -44,7 +44,7 @@ module.exports = {
       });
       res.send(invites);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取邀请时发生错误"});
     }
   },
@@ -59,7 +59,7 @@ module.exports = {
       await Invite.destroy({where: {datasetId, receiver}});
       res.send({message: "邀请已撤回"});
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "撤回邀请时发生错误"});
     }
   },
@@ -79,7 +79,7 @@ module.exports = {
       await invite.save();
       res.send(invite);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "处理邀请回复时发生错误"});
     }
   }

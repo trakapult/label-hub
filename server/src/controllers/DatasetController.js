@@ -1,5 +1,6 @@
-const { Dataset } = require("../models");
+const { Dataset, } = require("../models");
 const { Op }  = require("sequelize");
+const sequelize = require("sequelize");
 const fs = require("fs");
 const admZip = require("adm-zip");
 const sharp = require("sharp");
@@ -10,10 +11,17 @@ ffmpeg.setFfprobePath(ffprobe.path);
 const saveZip = (path, file) => {
   const zipFile = new admZip(fs.readFileSync(file.path));
   const zipEntries = zipFile.getEntries();
-  if (zipEntries.some((zipEntry, index) =>
-    zipEntry.entryName.split("/").length > 1
-    || zipEntry.entryName.split(".").length !== 2
-    || parseInt(zipEntry.entryName.split(".")[0]) !== index)) {
+  const indices = [];
+  const isValid = (entryName) => {
+    if (entryName.split("/").length > 1) return false;
+    if (entryName.split(".").length !== 2) return false;
+    const firstPart = entryName.split(".")[0];
+    if (firstPart === "entertain") return true;
+    if (indices.includes(firstPart)) return false;
+    indices.push(firstPart);
+    return true;
+  }
+  if (zipEntries.some((zipEntry) => !isValid(zipEntry.entryName))) {
     fs.unlinkSync(file.path);
     return false;
   }
@@ -44,7 +52,7 @@ const removeFiles = (path) => {
 module.exports = {
   async create (req, res) {
     try {
-      const {name, admin, description, dataType, labelType, labelInfo, segments, publicized} = req.body;
+      const {name, admin, description, type, dataType, labelType, labelInfo, segments} = req.body;
       const file = req.file;
       if (req.user.name !== admin) {
         res.status(403).send({error: "您无权创建此数据集"});
@@ -54,12 +62,21 @@ module.exports = {
         res.status(400).send({error: "数据集文件未上传"});
         return;
       }
-      const sampleNum = new admZip(fs.readFileSync(file.path)).getEntries().length;
+      const zipFile = new admZip(fs.readFileSync(file.path));
+      let sampleNum = zipFile.getEntries().length;
+      if (type === "entertain") {
+        if (!zipFile.getEntry("entertain.json")) {
+          fs.unlinkSync(file.path);
+          res.status(400).send({error: "娱乐数据集应包含名为entertain.json的文件"});
+          return;
+        }
+        sampleNum -= 1;
+      }
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
-      const dataset = await Dataset.create({name, admin, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments, publicized});
+      const dataset = await Dataset.create({name, admin, description, sampleNum, type, dataType, labelType, labelInfo: labelInfoParsed, segments});
       const path = `./data/datasets/${dataset.id}`;
       if (!saveZip(path, file)) {
         await dataset.destroy();
@@ -67,14 +84,8 @@ module.exports = {
         return;
       }
       res.send(dataset);
-      /*if (publicized) {
-        const user = await User.findOne({where: {name: admin}});
-        const num = segments ? config.points.segments : config.points.noSegments;
-        await user.update({points: user.points + num * sampleNum});
-      }*/
-      // TODO: 为确保不同文件多次交，且数据集有标注，需等所有样本至少有一个标注以后再发放积分
     } catch(err) {
-      console.log(err);
+      console.error(err);
       if (err.name === "SequelizeUniqueConstraintError") {
         res.status(400).send({error: "数据集已存在"});
       } else {
@@ -91,7 +102,19 @@ module.exports = {
         return;
       }
       const file = req.file;
-      const sampleNum = file ? new admZip(fs.readFileSync(file.path)).getEntries().length : dataset.sampleNum;
+      let sampleNum = dataset.sampleNum;
+      if (file) {
+        const zipFile = new admZip(fs.readFileSync(file.path));
+        sampleNum = zipFile.getEntries().length;
+        if (dataset.type === "entertain") {
+          if (!zipFile.getEntry("entertain.json")) {
+            fs.unlinkSync(file.path);
+            res.status(400).send({error: "娱乐数据集应包含名为entertain.json的文件"});
+            return;
+          }
+          sampleNum -= 1;
+        }
+      }
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
@@ -107,7 +130,7 @@ module.exports = {
       }
       res.send(dataset);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "编辑数据集时发生错误"});
     }
   },
@@ -123,16 +146,15 @@ module.exports = {
       await dataset.destroy();
       res.send(dataset);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "删除数据集时发生错误"});
     }
   },
   async showAll (req, res) {
     try {
       let datasets = null;
-      const {search, admin, dataType, labelType} = req.query;
+      const {search, admin, type, dataType, labelType} = req.query;
       const segments = req.query.segments === "yes" ? true : req.query.segments === "no" ? false : null;
-      const publicized = req.query.publicized === "yes" ? true : req.query.publicized === "no" ? false : null;
       datasets = await Dataset.findAll({
         where: {
           [Op.and]: [
@@ -142,18 +164,29 @@ module.exports = {
               {description: {[Op.substring]: search}}
             ]},
             admin && {admin},
+            type && {type},
             dataType && {dataType},
             labelType && {labelType},
-            segments !== null && {segments},
-            publicized !== null && {publicized}
+            segments !== null && {segments}
           ]
+        },
+        // TODO: add count of labels with validated = true as labelerNum
+        attributes: {
+          include: [[
+            sequelize.literal(`(
+              SELECT COUNT(*)
+              FROM "Labels"
+              WHERE "Labels"."datasetId" = "Dataset"."id" AND "Labels"."validated" = true)`
+            ),
+            "labelerNum"
+          ]]
         },
         order: [["createdAt", "DESC"]],
         limit: 100
       });
       res.send(datasets);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取数据集时发生错误"});
     }
   },
@@ -162,38 +195,50 @@ module.exports = {
       const dataset = await Dataset.findByPk(req.params.datasetId);
       res.send(dataset);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取数据集时发生错误"});
     }
   },
   async sendFile (req, res) {
     try {
-      const dataset = await Dataset.findByPk(req.params.datasetId);
+      const {datasetId, sampleId} = req.params;
+      const dataset = await Dataset.findByPk(datasetId);
       const path = `./data/datasets/${dataset.id}`;
       extractZip(path);
-      const name = fs.readdirSync(path).find((name) => name.startsWith(req.params.sampleId + "."));
-      const file = fs.readFileSync(`${path}/${name}`, dataset.dataType === "text" ? "utf-8" : "binary");
-      let fileInfo = null;
+      const name = fs.readdirSync(path).find((name) => name.startsWith(sampleId + "."));
+      if (!name) {
+        res.send({});
+        return;
+      }
+      const filePath = `${path}/${name}`;
+      let file = null, fileInfo = null; 
       if (dataset.dataType === "text") {
+        file = fs.readFileSync(filePath, "utf-8");
         fileInfo = {length: file.length};
       } else if (dataset.dataType === "image") {
-        const {width, height} = await sharp(`${path}/${name}`).metadata();
+        file = fs.readFileSync(filePath).toString("binary");
+        const image = sharp(filePath);
+        let {width, height} = await image.metadata();
+        if (dataset.segments === false && height > 300) {
+          width = Math.ceil(width / height * 300);
+          height = 300;
+          const buffer = await image.resize(width, height).toBuffer();
+          file = buffer.toString("binary");
+        }
         fileInfo = {width, height};
       } else if (dataset.dataType === "audio") {
-        const getDuration = (filePath) => {
-          return new Promise((resolve, reject) => {
-            ffmpeg.ffprobe(filePath, (err, metadata) => {
-              if (err) reject(err);
-              resolve(metadata.format.duration);
-            });
+        file = fs.readFileSync(filePath, "binary");
+        const duration = await new Promise((resolve, reject) => {
+          ffmpeg.ffprobe(filePath, (err, metadata) => {
+            if (err) reject(err);
+            resolve(metadata.format.duration);
           });
-        };
-        const duration = await getDuration(`${path}/${name}`);
+        });
         fileInfo = {duration};
       }
       res.send({file, fileInfo});
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取样本时发生错误"});
     }
   }

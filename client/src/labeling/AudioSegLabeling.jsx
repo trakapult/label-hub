@@ -15,7 +15,7 @@ async function drawWave(audio, wave, canvas) {
   const centerHeight = Math.ceil(height / 2);
   const scaleFactor = height / 2;
 
-  const buffer = await fetch(audio).then(response => response.arrayBuffer());
+  const buffer = await fetch(`data:audio/wav;base64,${btoa(audio)}`).then((res) => res.arrayBuffer());
   const audioBuffer = await new AudioContext().decodeAudioData(buffer);
   const float32Array = audioBuffer.getChannelData(0);
 
@@ -42,7 +42,7 @@ async function drawWave(audio, wave, canvas) {
 let doScroll = true;
 let mouseLeaveInterval = null;
 
-function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabelData, saveLabelData}) {
+function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabelData, saveLabelData}) {
   const audioRef = useRef(null);
   const containerRef = useRef(null);
   const waveRef = useRef(null);
@@ -78,7 +78,7 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
   }
 
   useEffect(() => {
-    drawWave(`data:audio/wav;base64,${btoa(file)}`, waveRef.current, canvasRef.current);
+    drawWave(file, waveRef.current, canvasRef.current);
   }, [file]);
 
   useEffect(() => {
@@ -274,4 +274,4 @@ function AudioLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabel
   );
 };
 
-export default AudioLabeling;
+export default AudioSegLabeling;

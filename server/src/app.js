@@ -5,12 +5,14 @@ const morgan = require("morgan");
 const { sequelize } = require("./models");
 const config = require("./config");
 const routes = require("./routes");
+const { Op } = require("sequelize");
+const cron = require("node-cron");
 
 const app = express();
 app.use(bodyParser.json()); // parses the body of the request
 app.use(cors()); // allows requests from any origin
 // app.use(morgan("combined")) // prints logs to the console
- app.use(morgan("dev")); // prints logs to the console
+app.use(morgan("dev")); // prints logs to the console
 require("./passport");
 routes(app);
 
@@ -21,40 +23,30 @@ sequelize.sync()
     })
   })
   .catch((err) => {
-    console.log(err)
+    console.error(err)
   });
 
 async function handleExpiredInvites() {
-  const { User, Dataset, Label, Invite } = require("./models");
   try {
-    const invites = await Invite.findAll();
+    console.log("Handling expired invites");
+    const { Dataset, Label, Invite, Points } = require("./models");
     const now = new Date();
+    const invites = await Invite.findAll({where: {deadline: {[Op.lt]: now}}});
     for (const invite of invites) {
-      if (now > invite.deadline) {
-        const user = await User.findOne({where: {name: invite.receiver}});
+      if (invite.status === "accepted") {
         const dataset = await Dataset.findByPk(invite.datasetId);
         const label = await Label.findOne({where: {datasetId: invite.datasetId, labeler: invite.receiver}});
         const correctNum = label ? label.correctNum : 0;
         const incorrectNum = dataset.sampleNum - correctNum;
-        user.score = Math.max(0, user.score + invite.reward * correctNum - invite.penalty * incorrectNum);
-        await user.save();
-        await invite.destroy();
+        const amount = invite.reward * correctNum - invite.penalty * incorrectNum;
+        await Points.create({receiver: invite.receiver, datasetId: invite.datasetId, reason: "getInviteReward", amount});
+        await Points.create({receiver: dataset.admin, datasetId: invite.datasetId, reason: "payInviteReward", amount: -amount});
       }
+      await invite.destroy();
     }
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
-function checkDate() {
-  console.log("Checking date");
-  const fs = require("fs");
-  const path = "./data/lastUpdateDate.txt";
-  if (!fs.existsSync(path || fs.readFileSync(path, "utf-8") < new Date().toISOString())) {
-    handleExpiredInvites();
-    fs.writeFileSync(path, new Date().toISOString());
-  }
-}
-
-checkDate();
-setInterval(checkDate, 1000 * 60 * 60 * 24);
+cron.schedule("0 0 * * *", handleExpiredInvites);

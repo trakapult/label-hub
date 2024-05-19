@@ -23,14 +23,13 @@ function Labeling () {
     if (!state.isLoggedIn) return;
     const loadLabelData = async () => {
       let res = await LabelService.get(state.token, datasetId, state.user.name);
-      const {label} = res.data;
-      if (!label) return;
+      const labeledNum = res.data.labeledNum;
+      if (!labeledNum) return;
       res = await LabelService.getLabelData(state.token, datasetId, state.user.name);
       const labelData = res.data;
       setLabelData(labelData);
-      const id = Math.max(0, label.labeledNum - 1);
-      setSampleId(id);
-      setCurLabelData(labelData[id] || "");
+      setSampleId(labeledNum - 1);
+      setCurLabelData(labelData[labeledNum - 1] || "");
     }
     loadLabelData();
   }, [state, datasetId]);
@@ -91,7 +90,7 @@ function Labeling () {
         navigate(`/user/${state.user.name}`);
         return true;
       } catch (err) {
-        console.log(err);
+        console.error(err);
         setError(err.response.data.error);
         return false;
       }

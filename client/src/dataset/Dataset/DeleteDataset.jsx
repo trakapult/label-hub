@@ -18,7 +18,7 @@ function DeleteDataset ({dataset}) {
       await DatasetService.delete(state.token, dataset.id);
       navigate(`/user/${state.user.name}`);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError(err.response.data.error);
     }
   }

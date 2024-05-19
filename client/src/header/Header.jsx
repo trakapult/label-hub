@@ -12,8 +12,8 @@ function Header() {
       <nav className="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
         <div className="container-fluid">
           <div className="navbar-nav">
-              <a className="nav-link active" href="/">LabelHub</a>
-              <a className="nav-link" href="/create">创建数据集</a>
+            <a className="nav-link active" href="/">LabelHub</a>
+            <a className="nav-link" href="/create">创建数据集</a>
           </div>
           {!state.isLoggedIn && (
             <div className="navbar-nav">

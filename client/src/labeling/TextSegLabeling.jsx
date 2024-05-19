@@ -6,7 +6,6 @@ import "./Labeling.css";
 const textLimit = 60;
 
 function TextSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLabelData, saveLabelData}) {
-
   const labelDataToSegments = (labelData) => {
     const segments = [];
     if (!labelData) {
@@ -103,6 +102,7 @@ function TextSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLab
       }
     }
     if (!flag) newSegments.push({start, end, label});
+    console.log("newSegments", newSegments);
     setSegments(newSegments);
     const newSortedSegments = sort(newSegments);
     setSortedSegments(newSortedSegments);
@@ -133,7 +133,7 @@ function TextSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLab
     setSaved(false);
   };
 
-  const handleAuxClick = (e) => {
+  const handleAuxClick = () => {
     const newSegments = [...segments];
     for (let i = newSegments.length - 1; i >= 0; i--) {
       if (newSegments[i].label !== null) {

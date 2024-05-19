@@ -12,7 +12,7 @@ module.exports = {
       });
       res.send(users);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取用户时发生错误"});
     }
   },
@@ -21,7 +21,7 @@ module.exports = {
       const user = await User.findOne({where: {name: req.params.name}});
       res.send(user);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       res.status(400).send({error: "获取用户时发生错误"});
     }
   }

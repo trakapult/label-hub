@@ -9,7 +9,7 @@ function DatasetCard ({dataset}) {
         <p className="card-text">{dataset.description}</p>
         <div className="row justify-content-center">
           <div className="col-md-4">
-            <Icons dataType={dataset.dataType} labelType={dataset.labelType} segments={dataset.segments} publicized={dataset.publicized} />
+            <Icons type={dataset.type} dataType={dataset.dataType} labelType={dataset.labelType} segments={dataset.segments} />
           </div>
         </div>
         <a className="btn btn-primary" href={`/dataset/${dataset.id}`}>查看</a>

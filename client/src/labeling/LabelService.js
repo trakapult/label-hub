@@ -1,8 +1,8 @@
 import api from '@/api';
 
 export default {
-  create (token, datasetId, labeler, labels) {
-    return api(token).post("label", {datasetId, labeler, labels});
+  create (token, datasetId, labeler, labelData) {
+    return api(token).post("label", {datasetId, labeler, labelData});
   },
   get (token, datasetId, labeler) { // occupies paths like /label/datasets/... and label/labelers/...
     return api(token).get(`/label/${datasetId}/${labeler}`);

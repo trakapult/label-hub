@@ -6,9 +6,15 @@ const datasets = require("./datasets.json");
 async function seed () {
   await sequelize.sync({force: true});
   console.log("Database synced");
-  await User.bulkCreate(users);
+  for (const user of users) {
+    await User.create(user);
+  }
+  // await User.bulkCreate(users);
   console.log("Users created");
-  await Dataset.bulkCreate(datasets);
+  for (const dataset of datasets) {
+    await Dataset.create(dataset);
+  }
+  // await Dataset.bulkCreate(datasets);
   console.log("Datasets created");
 
   if (fs.existsSync("./data")) {
@@ -31,5 +37,5 @@ async function seed () {
 try {
   seed();
 } catch (err) {
-  console.log(err);
+  console.error(err);
 }

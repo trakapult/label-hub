@@ -74,6 +74,7 @@ function EditDatasetPanel ({dataset}) {
       const name = e.target.name.value;
       const description = e.target.description.value;
       const admin = state.user.name;
+      const type = e.target.type.value;
       const dataType = e.target.dataType.value;
       const labelType = e.target.labelType.value;
       const min = e.target.min?.value, max = e.target.max?.value;
@@ -85,17 +86,16 @@ function EditDatasetPanel ({dataset}) {
         labelInfo = categories.split(",");
       }
       const segments = e.target.segments.checked;
-      const publicized = e.target.publicized.checked;
       const file = e.target.samples.files[0];
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
       formData.append("admin", admin);
+      formData.append("type", type);
       formData.append("dataType", dataType);
       formData.append("labelType", labelType);
       formData.append("labelInfo", JSON.stringify(labelInfo));
       formData.append("segments", segments);
-      formData.append("publicized", publicized);
       if (file) formData.append("file", file);
       let res = null;
       if (dataset) {
@@ -105,7 +105,7 @@ function EditDatasetPanel ({dataset}) {
       }
       navigate("/dataset/" + res.data.id);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       setError(err.response.data.error);
     }
   }
@@ -124,8 +124,16 @@ function EditDatasetPanel ({dataset}) {
         </div>
         <div className="row align-items-center mb-3">
           <div className="col-md-2">
+            <select className="form-select" id="type" required>
+              <option value="">(类型)</option>
+              <option value="public">公开</option>
+              <option value="private">私有</option>
+              <option value="entertain">娱乐</option>
+            </select>
+          </div>
+          <div className="col-md-2">
             <select className="form-select" id="dataType" required>
-              <option value="">数据：</option>
+              <option value="">(数据)</option>
               <option value="text">文本</option>
               <option value="image">图像</option>
               <option value="audio">音频</option>
@@ -133,7 +141,7 @@ function EditDatasetPanel ({dataset}) {
           </div>
           <div className="col-md-2">
             <select className="form-select" id="labelType" required onChange={handleChange}>
-              <option value="">标注：</option>
+              <option value="">(标注)</option>
               <option value="numerical">数值</option>
               <option value="categorical">分类</option>
               <option value="textual">文本</option>
@@ -146,12 +154,6 @@ function EditDatasetPanel ({dataset}) {
             <div className="form-check form-switch">
               <input className="form-check-input" type="checkbox" id="segments" />
               <label className="form-check-label" htmlFor="segments">分段</label>
-            </div>
-          </div>
-          <div className="col-md-2">
-            <div className="form-check form-switch">
-              <input className="form-check-input" type="checkbox" id="publicized" />
-              <label className="form-check-label" htmlFor="publicized">公开</label>
             </div>
           </div>
         </div>

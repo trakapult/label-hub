@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import View from "@/view/View";
+import Users from "@/user/Users";
 import DeleteDataset from "./DeleteDataset";
 import InviteForm from "@/invite/InviteForm";
 import ViewSentInvites from "@/invite/ViewSentInvites";
@@ -14,6 +15,7 @@ const height = 300;
 function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
   const {state} = useAuthContext();
   const [popup, setPopup] = useState("");
+  const types = [["public", "公开"], ["private", "私有"], ["entertain", "娱乐"]];
   const dataTypes = [["text", "文本"], ["image", "图像"], ["audio", "音频"]];
   const labelTypes = [["numerical", "数值"], ["categorical", "分类"], ["textual", "文本"]];
 
@@ -21,11 +23,14 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
     if (label === null || state.user.name !== label.labeler)
       return null;
     return (
-      <div className="progress mb-3">
-        <div className="progress-bar bg-success" style={{width: `${label.labeledNum / dataset.sampleNum * 100}%`}}>
-          我的标注进度：{label.labeledNum} / {dataset.sampleNum}
+      <>
+        我的标注进度：
+        <div className="progress mb-3">
+          <div className="progress-bar bg-success" style={{width: `${label.labeledNum / dataset.sampleNum * 100}%`}}>
+            {label.labeledNum} / {dataset.sampleNum}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
@@ -47,7 +52,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
         const res = await LabelService.getLabelData(state.token, datasetId, labeler);
         downloadFile(JSON.stringify(res.data), `${datasetId}_${labeler}.json`);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         alert(err.response.data.error);
       }
     }
@@ -60,16 +65,17 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
         }
         downloadFile(JSON.stringify(record), `${datasetId}.json`);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         alert(err.response.data.error);
       }
     }
     const labeledSum = labels.reduce((sum, label) => sum + label.labeledNum, 0);
     return (
       <>
+        整体标注进度：
         <div className="progress mb-3">
           <div className="progress-bar bg-success" style={{width: `${labeledSum / (dataset.sampleNum * labels.length) * 100}%`}}>
-            整体标注进度：{labeledSum} / {dataset.sampleNum * labels.length}
+            {labeledSum} / {dataset.sampleNum * labels.length}
           </div>
         </div>
         标注记录（共{labels.length}人）：
@@ -79,6 +85,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
               <tr>
                 <th>标注者</th>
                 <th>进度</th>
+                <th>已验证</th>
                 <th>开始时间</th>
                 <th>更新时间</th>
                 <th>
@@ -101,6 +108,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
                     </a>
                   </td>
                   <td>{label.labeledNum} / {dataset.sampleNum}</td>
+                  <td>{label.validated ? "是" : "否"}</td>
                   <td>{new Date(label.createdAt).toLocaleString()}</td>
                   <td>{new Date(label.updatedAt).toLocaleString()}</td>
                   <td>
@@ -128,7 +136,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
             <div className="img-container">
               {dataset.dataType === "text" && <p>{file}</p>}
               {dataset.dataType === "image" && <img src={`data:image;base64,${btoa(file)}`} alt="sample" />}
-              {dataset.dataType === "audio" && <audio src={`data:audio/mp3;base64,${btoa(file)}`} controls />}
+              {dataset.dataType === "audio" && <audio src={`data:audio/wav;base64,${btoa(file)}`} controls />}
           </div>
         </div>
       </div>
@@ -151,16 +159,19 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
                   <a className="btn btn-primary" href={`/dataset/${dataset.id}/edit`}>编辑</a>
                   <button className="btn btn-primary" type="button" onClick={() => setPopup("DeleteDataset")}>删除</button>
                 </div>
-                <div className="btn-group">
-                  <button className="btn btn-primary" type="button" onClick={() => setPopup("InviteForm")}>发送邀请</button>
-                  <button className="btn btn-primary" type="button" onClick={() => setPopup("ViewSentInvites")}>发送情况</button>
-                </div>
+                {dataset.type !== "entertain" && (
+                  <div className="btn-group">
+                    <button className="btn btn-primary" type="button" onClick={() => setPopup("InviteForm")}>发送邀请</button>
+                    <button className="btn btn-primary" type="button" onClick={() => setPopup("ViewSentInvites")}>发送情况</button>
+                  </div>
+                )}
               </div>
             )}
           </div>
-          
-          <View service={LabelService.get} params={[dataset.id, state.user.name]} handleLoad={handleRecordLoad} />
-          {(dataset.publicized || state.user.name === dataset.admin) &&
+          {dataset.type !== "entertain" && 
+            <View service={LabelService.get} params={[dataset.id, state.user.name]} handleLoad={handleRecordLoad} />
+          }
+          {dataset.type !== "entertain" && (dataset.type === "public" || state.user.name === dataset.admin) &&
             <View service={LabelService.getLabelRecords} params={[dataset.id, state.user.name]} handleLoad={handleRecordsLoad} />
           }
           <div className="input-group mb-3">
@@ -174,6 +185,20 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
             />
           </div>
           <div className="row align-items-center mb-3">
+            <div className="col-md-3">
+              类型：
+              <div className="btn-group">
+                {types.map(([type, name], index) => (
+                  <button
+                    className={"btn " + (type === dataset.type ? " btn-primary" : " btn-secondary")}
+                    type="button"
+                    value={type}
+                    key={index}>
+                    {name}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="col-md-3">
               数据类型：
               <div className="btn-group">
@@ -202,8 +227,8 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
                 ))}
               </div>
             </div>
-            <div className="col-md-4">
-              {dataset.labelType === "numerical" && (
+            <div className="col-md-2">
+            {dataset.labelType === "numerical" && (
                 <div className="input-group">
                   <span className="input-group-text">范围</span>
                   <input className="form-control" type="number" id="min" value={dataset.labelInfo.min} readOnly />
@@ -227,16 +252,21 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
                 <label className="form-check-label" htmlFor="segments">分段</label>
               </div>
             </div>
-            <div className="col-md-1">
-              <div className="form-check">
-                <input className="form-check-input" type="checkbox" id="publicized" checked={dataset.publicized} readOnly />
-                <label className="form-check-label" htmlFor="publicized">公开</label>
+          </div>
+          {dataset.type !== "entertain" && (
+            <>
+              样本示例：
+              <br />
+              <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleSampleLoad} />
+            </>
+          )}
+          {dataset.type === "entertain" && (
+            <div className="row justify-content-center mb-3">
+              <div className="col-md-6">
+                <Users title="排行榜" service={LabelService.getLabelRecords} params={dataset.id} attrNames={["标注者", "得分"]} attrs={["labeler", "correctNum"]} />
               </div>
             </div>
-          </div>
-          样本示例：
-          <br />
-          <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleSampleLoad} />
+          )}
           <div className="text-center mt-3">
             <button className="btn btn-primary" type="button" onClick={() => handleClick(dataset)}>{buttonText}</button>
           </div>

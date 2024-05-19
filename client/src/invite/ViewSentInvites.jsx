@@ -11,7 +11,7 @@ function ViewSentInvites ({datasetId}) {
       const res = await InviteService.getSent(state.token, datasetId);
       setInvites(res.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       alert(err.response.data.error);
     }
   }
@@ -29,7 +29,7 @@ function ViewSentInvites ({datasetId}) {
       setInvites(invites.filter((invite) => invite.receiver !== receiver));
       console.log(res.data);
     } catch(err) {
-      console.log(err);
+      console.error(err);
       alert(err.response.data.error);
     }
   };

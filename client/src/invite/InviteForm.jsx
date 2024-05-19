@@ -31,7 +31,7 @@ function InviteForm ({datasetId}) {
       e.target.querySelector("button").classList.add("btn-success");
       e.target.querySelector("button").disabled = true;
     } catch(err) {
-      console.log(err);
+      console.error(err);
       setError(err.response.data.error);
     }
   }

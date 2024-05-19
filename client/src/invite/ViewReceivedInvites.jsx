@@ -11,7 +11,7 @@ function ViewReceivedInvites () {
       const res = await InviteService.getReceived(state.token, state.user.name);
       setInvites(res.data);
     } catch (err) {
-      console.log(err);
+      console.error(err);
       alert(err.response.data.error);
     }
   }
@@ -29,7 +29,7 @@ function ViewReceivedInvites () {
       const status = response === "accept" ? "已接受" : response === "reject" ? "已拒绝" : "等待回复";
       setInvites(invites.map((invite) => invite.datasetId === datasetId ? {...invite, status} : invite));
     } catch(err) {
-      console.log(err);
+      console.error(err);
       alert(err.response.data.error);
     }
   }

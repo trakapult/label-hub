@@ -6,15 +6,15 @@ module.exports = {
       name: Joi.string().required(),
       description: Joi.string().required(),
       admin: Joi.string().required(),
-      dataType: Joi.string().required(),
-      labelType: Joi.string().required(),
+      type: Joi.string().valid("public", "private", "entertain").required(),
+      dataType: Joi.string().valid("text", "image", "audio").required(),
+      labelType: Joi.string().valid("categorical", "numerical", "textual").required(),
       labelInfo: Joi.alternatives(
         Joi.string().pattern(new RegExp("^\\{\"min\":\"-?\\d+\",\"max\":\"-?\\d+\"\\}$")).required(),
         Joi.string().pattern(new RegExp("^\\[\"[^\"]+\"(,\"[^\"]+\")*\\]$")).required(),
         "null"
       ).required(),
-      segments: Joi.boolean().required(),
-      publicized: Joi.boolean().required()
+      segments: Joi.boolean().required()
     });
     let {error} = schema.validate(req.body);
     if (req.body.labelType === "numerical" && !error) {
@@ -24,7 +24,7 @@ module.exports = {
       }
     }
     if (error) {
-      console.log(error);
+      console.error(error);
       if (typeof error === "string") {
         res.status(400).send({error});
       } else {
