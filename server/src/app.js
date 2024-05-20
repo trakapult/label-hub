@@ -16,37 +16,54 @@ app.use(morgan("dev")); // prints logs to the console
 require("./passport");
 routes(app);
 
-sequelize.sync()
-  .then(() => {
-    app.listen(config.port, () => {
-      console.log(`Server started on port ${config.port}`)
-    })
+sequelize.sync().then(() => {
+  app.listen(config.port, () => {
+    console.log(`Server started on port ${config.port}`)
   })
-  .catch((err) => {
-    console.error(err)
-  });
+}).catch((err) => {
+  console.error(err)
+});
 
-async function handleExpiredInvites() {
-  try {
-    console.log("Handling expired invites");
-    const { Dataset, Label, Invite, Points } = require("./models");
-    const now = new Date();
-    const invites = await Invite.findAll({where: {deadline: {[Op.lt]: now}}});
-    for (const invite of invites) {
-      if (invite.status === "accepted") {
-        const dataset = await Dataset.findByPk(invite.datasetId);
-        const label = await Label.findOne({where: {datasetId: invite.datasetId, labeler: invite.receiver}});
-        const correctNum = label ? label.correctNum : 0;
-        const incorrectNum = dataset.sampleNum - correctNum;
-        const amount = invite.reward * correctNum - invite.penalty * incorrectNum;
-        await Points.create({receiver: invite.receiver, datasetId: invite.datasetId, reason: "getInviteReward", amount});
-        await Points.create({receiver: dataset.admin, datasetId: invite.datasetId, reason: "payInviteReward", amount: -amount});
-      }
-      await invite.destroy();
-    }
-  } catch (err) {
-    console.error(err);
+function getAnswer(labels, dataset) {
+  return {};
+}
+
+function equal(a, b) {
+  return true;
+}
+
+function updateCorrectNum(labels, dataset) {
+  const validLabels = labels.filter((label) => label.validated);
+  if (validLabels.length === 0)
+    return;
+  const answer = getAnswer(validLabels, dataset);
+  for (const label of labels) {
+    const correctNum = Object.keys(answer).filter((key) => equal(answer[key], label[key])).length;
+    label.update({correctNum});
   }
 }
 
-cron.schedule("0 0 * * *", handleExpiredInvites);
+async function handleExpiredDatasets() {
+  const { Dataset, Label, Invite } = require("./models");
+  const datasets = await Dataset.findAll({where: {deadline: {[Op.lt]: new Date()}, settled: false}});
+  for (const dataset of datasets) {
+    const labels = await Label.findAll({where: {datasetId: dataset.id}});
+    updateCorrectNum(labels, dataset);
+    for (const label of labels) {
+      const invite = await Invite.findOne({where: {datasetId: dataset.id, receiver: label.labeler}});
+      if (invite) {
+        await invite.destroy();
+      }
+    }
+    await dataset.update({settled: true});
+  }
+}
+
+cron.schedule("0 0 * * *", () => {
+  console.log("Handling expired datasets");
+  handleExpiredDatasets().then(() => {
+    console.log("Expired datasets handled");
+  }).catch((err) => {
+    console.error(err);
+  });
+});

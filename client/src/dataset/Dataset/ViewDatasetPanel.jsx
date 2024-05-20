@@ -49,7 +49,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
     }
     const download = async (datasetId, labeler) => {
       try {
-        const res = await LabelService.getLabelData(state.token, datasetId, labeler);
+        const res = await LabelService.getLabelData(state.token, datasetId, labeler, true);
         downloadFile(JSON.stringify(res.data), `${datasetId}_${labeler}.json`);
       } catch (err) {
         console.error(err);
@@ -60,7 +60,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
       try {
         const record = {};
         for (const label of labels) {
-          const res = await LabelService.getLabelData(state.token, datasetId, label.labeler);
+          const res = await LabelService.getLabelData(state.token, datasetId, label.labeler, true);
           record[label.labeler] = res.data;
         }
         downloadFile(JSON.stringify(record), `${datasetId}.json`);
@@ -142,6 +142,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
       </div>
     );
   }
+  console.log(dataset.deadline, typeof dataset.deadline);
 
   return (
     <>
@@ -268,7 +269,13 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
             </div>
           )}
           <div className="text-center mt-3">
-            <button className="btn btn-primary" type="button" onClick={() => handleClick(dataset)}>{buttonText}</button>
+            <button
+              className={"btn btn-primary" + (new Date(dataset.deadline) < new Date() ? " disabled" : "")}
+              type="button"
+              onClick={() => handleClick(dataset)}
+            >
+              {buttonText}
+            </button>
           </div>
         </form>
       </div>

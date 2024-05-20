@@ -86,6 +86,7 @@ function EditDatasetPanel ({dataset}) {
         labelInfo = categories.split(",");
       }
       const segments = e.target.segments.checked;
+      const deadline = e.target.deadline.value;
       const file = e.target.samples.files[0];
       const formData = new FormData();
       formData.append("name", name);
@@ -96,6 +97,7 @@ function EditDatasetPanel ({dataset}) {
       formData.append("labelType", labelType);
       formData.append("labelInfo", JSON.stringify(labelInfo));
       formData.append("segments", segments);
+      formData.append("deadline", deadline);
       if (file) formData.append("file", file);
       let res = null;
       if (dataset) {
@@ -156,6 +158,12 @@ function EditDatasetPanel ({dataset}) {
               <label className="form-check-label" htmlFor="segments">分段</label>
             </div>
           </div>
+        </div>
+        <div className="input-group mb-3">
+          <span className="input-group-text">期限</span>
+          <input className="form-control" type="date" id="deadline" defaultValue={
+            new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
+          } required />
         </div>
         <div className="input-group">
           <span className="input-group-text">样本</span>

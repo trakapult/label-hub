@@ -16,7 +16,11 @@ function Users ({title, service, params=null, attrNames, attrs}) {
           <tbody>
             {rows.map((row, index) => (
               <tr key={index}>
-                {attrs.map((attr, index) => <td key={index}>{row[attr]}</td>)}
+                {attrs.map((attr, index) =>
+                  <td key={index}>
+                    {index ? row[attr] : <a href={`/user/${row[attr]}`} style={{textDecoration: "none"}}>{row[attr]}</a>}
+                  </td>)
+                }
               </tr>
             ))}
           </tbody>

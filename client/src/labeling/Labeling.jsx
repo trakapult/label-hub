@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useAuthContext } from "@/context/AuthContext";
 import View from "@/view/View";
 import Error from "@/common/Error";
+import Timer from "@/common/Timer";
 import LabelingPanel from "./LabelingPanel";
 import SegLabeling from "./SegLabeling";
 import DatasetService from "@/dataset/DatasetService";
@@ -53,15 +54,23 @@ function Labeling () {
 
   const handleDatasetLoad = (dataset) => {
     const {labelType, labelInfo, segments} = dataset;
+    const graph = dataset?.settings?.graph;
 
-    const move = (step) => () => {
-      const nextSampleId = sampleId + step;
-      if (0 <= nextSampleId && nextSampleId < dataset.sampleNum) {
-        setSampleId(nextSampleId);
-        setCurLabelData(labelData[nextSampleId] || "");
+    const moveTo = (next) => () => {
+      if (0 <= next && next < dataset.sampleNum) {
+        setSampleId(next);
+        setCurLabelData(labelData[next] || "");
         return true;
       }
       return false;
+    }
+    const getNext = (label) => {
+      let next = sampleId + 1;
+      if (graph) {
+        next = graph[sampleId]?.[label];
+        if (next === undefined) next = sampleId;
+      }
+      return next;
     }
 
     const saveLabelData = (value) => {
@@ -74,7 +83,7 @@ function Labeling () {
         setLabelData(newLabelData);
       }
       if (autojump) {
-        if (!move(1)())
+        if (!moveTo(getNext(newLabel))())
           setCurLabelData(newLabel);
       } else {
         setCurLabelData(newLabel);
@@ -121,11 +130,14 @@ function Labeling () {
         </>
       );
     }
-
+    console.log(dataset);
     return (
       <>
         <div className="row justify-content-center">
           <div className="col-md-6">
+            {dataset?.settings?.time &&
+              <Timer minutes={dataset.settings.time} navigateTo={`/dataset/${datasetId}`} />
+            }
             <div className="progress mb-3">
               <div
                 className="progress-bar bg-success"
@@ -145,10 +157,10 @@ function Labeling () {
         </div>
         <div className="d-flex justify-content-center gap-2 mt-2">
           <button
-            className={"btn btn-primary" + (sampleId === 0 ? " disabled" : "")}
+            className={"btn btn-primary" + (sampleId === 0 || dataset?.settings?.graph ? " disabled" : "")}
             type="button"
             id="prev"
-            onClick={move(-1)}
+            onClick={moveTo(sampleId - 1)}
           >
             上一个
           </button>
@@ -157,7 +169,7 @@ function Labeling () {
             className={"btn btn-primary" + (!curLabelData || sampleId === dataset.sampleNum - 1 ? " disabled" : "")}
             type="button"
             id="next"
-            onClick={move(1)}
+            onClick={moveTo(getNext(curLabelData))}
           >
             下一个
           </button>

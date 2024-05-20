@@ -24,6 +24,11 @@ module.exports = (sequelize, DataTypes) => {
     reward: {
       type: DataTypes.INTEGER,
       validate: {min: 0}
+    },
+    deadline: DataTypes.DATE,
+    settled: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     }
   }, {
     uniqueKeys: {
@@ -45,13 +50,15 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
   Dataset.beforeSave(async (dataset) => {
-    if (dataset.reward) return;
-    if (dataset.type === "entertain") {
-      dataset.reward = 0;
-    } else if (dataset.segments) {
-      dataset.reward = 2;
-    } else {
-      dataset.reward = 1;
+    if (!dataset.reward) {
+      if (dataset.segments) {
+        dataset.reward = 2;
+      } else {
+        dataset.reward = 1;
+      }
+    }
+    if (!dataset.deadline) {
+      dataset.deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
     }
   });
   Dataset.afterUpdate(async (dataset) => {
@@ -62,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
       reason: "upload"
     }});
     if (points) {
-      await points.update({amount: dataset.type === "public" ? 5 * dataset.sampleNum : 0});
+      await points.update({amount: dataset.type === "public" ? 20 * dataset.sampleNum : 0});
     }
   });
   Dataset.afterDestroy(async (dataset) => {

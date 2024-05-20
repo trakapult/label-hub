@@ -35,12 +35,13 @@ module.exports = (sequelize, DataTypes) => {
   Points.afterCreate(async (points) => {
     const { User } = points.sequelize.models;
     const user = await User.findOne({where: {name: points.receiver}});
-    console.log("wwwww", user.points, points.amount);
+    console.log("Ceate", user.points, points.amount);
     await user.update({points: Math.max(0, user.points + points.amount)});
   });
   Points.afterUpdate(async (points) => {
     const { User } = points.sequelize.models;
     const user = await User.findOne({where: {name: points.receiver}});
+    console.log("Update", user.points, points._previousDataValues.amount, points.amount, Math.max(0, user.points - points._previousDataValues.amount + points.amount));
     await user.update({points: Math.max(0, user.points - points._previousDataValues.amount + points.amount)});
   });
   Points.afterDestroy(async (points) => {

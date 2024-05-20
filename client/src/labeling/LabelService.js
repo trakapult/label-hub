@@ -13,7 +13,7 @@ export default {
   getLabelRecords (token, datasetId) {
     return api(token).get(`/labelRecords/${datasetId}`);
   },
-  getLabelData (token, datasetId, labeler) {
-    return api(token).get(`/record/${datasetId}/${labeler}`);
+  getLabelData (token, datasetId, labeler, nameAsKey = false) {
+    return api(token).get(`/record/${datasetId}/${labeler}` + (nameAsKey ? "?nameAsKey=true" : ""));
   }
 };

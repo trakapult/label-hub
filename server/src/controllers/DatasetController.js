@@ -8,25 +8,31 @@ const ffmpeg = require("fluent-ffmpeg");
 const ffprobe = require("ffprobe-static");
 ffmpeg.setFfprobePath(ffprobe.path);
 
-const saveZip = (path, file) => {
+const allowedFileTypes = {
+  text: ["txt"],
+  image: ["jpg", "jpeg", "png", "bmp", "webp"],
+  audio: ["mp3", "wav", "flac"]
+};
+
+const isValid = (entryName, dataType) => {
+  if (entryName.split(".").length < 2) return false;
+  const extension = entryName.split(".").pop().toLowerCase();
+  return allowedFileTypes[dataType].includes(extension);
+}
+
+const saveZip = (path, file, dataType) => {
   const zipFile = new admZip(fs.readFileSync(file.path));
   const zipEntries = zipFile.getEntries();
-  const indices = [];
-  const isValid = (entryName) => {
-    if (entryName.split("/").length > 1) return false;
-    if (entryName.split(".").length !== 2) return false;
-    const firstPart = entryName.split(".")[0];
-    if (firstPart === "entertain") return true;
-    if (indices.includes(firstPart)) return false;
-    indices.push(firstPart);
-    return true;
-  }
-  if (zipEntries.some((zipEntry) => !isValid(zipEntry.entryName))) {
-    fs.unlinkSync(file.path);
-    return false;
+  const names = {};
+  let index = 0;
+  for (const zipEntry of zipEntries) {
+    if (isValid(zipEntry.entryName, dataType)) {
+      names[index++] = zipEntry.entryName;
+    }
   }
   removeFiles(path);
   fs.writeFileSync(path + ".zip", fs.readFileSync(file.path));
+  fs.writeFileSync(`${path}_names.json`, JSON.stringify(names));
   fs.unlinkSync(file.path);
   return true;
 };
@@ -34,25 +40,22 @@ const saveZip = (path, file) => {
 const extractZip = (path) => {
   if (fs.existsSync(path)) return;
   const zipFile = new admZip(fs.readFileSync(path + ".zip"));
-  const zipEntries = zipFile.getEntries();
-  zipEntries.forEach((zipEntry) => {
-    zipFile.extractEntryTo(zipEntry.entryName, path, false, true);
-  });
+  zipFile.extractAllTo(path, true);
 };
 
 const removeFiles = (path) => {
-  if (fs.existsSync(path)) {
+  if (fs.existsSync(path))
     fs.rmdirSync(path, {recursive: true});
-  }
-  if (fs.existsSync(path + ".zip")) {
+  if (fs.existsSync(path + ".zip"))
     fs.rmSync(path + ".zip");
-  }
+  if (fs.existsSync(`${path}_names.json`))
+    fs.rmSync(`${path}_names.json`);
 }
 
 module.exports = {
   async create (req, res) {
     try {
-      const {name, admin, description, type, dataType, labelType, labelInfo, segments} = req.body;
+      const {name, admin, description, type, dataType, labelType, labelInfo, segments, deadline} = req.body;
       const file = req.file;
       if (req.user.name !== admin) {
         res.status(403).send({error: "您无权创建此数据集"});
@@ -63,26 +66,14 @@ module.exports = {
         return;
       }
       const zipFile = new admZip(fs.readFileSync(file.path));
-      let sampleNum = zipFile.getEntries().length;
-      if (type === "entertain") {
-        if (!zipFile.getEntry("entertain.json")) {
-          fs.unlinkSync(file.path);
-          res.status(400).send({error: "娱乐数据集应包含名为entertain.json的文件"});
-          return;
-        }
-        sampleNum -= 1;
-      }
+      let sampleNum = zipFile.getEntries().filter((zipEntry) => isValid(zipEntry.entryName, dataType)).length;
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
         labelInfoParsed = JSON.parse(labelInfo);
       }
-      const dataset = await Dataset.create({name, admin, description, sampleNum, type, dataType, labelType, labelInfo: labelInfoParsed, segments});
+      const dataset = await Dataset.create({name, admin, description, sampleNum, type, dataType, labelType, labelInfo: labelInfoParsed, segments, deadline});
       const path = `./data/datasets/${dataset.id}`;
-      if (!saveZip(path, file)) {
-        await dataset.destroy();
-        res.status(400).send({error: "数据集文件格式错误"});
-        return;
-      }
+      saveZip(path, file, dataType);
       res.send(dataset);
     } catch(err) {
       console.error(err);
@@ -105,15 +96,7 @@ module.exports = {
       let sampleNum = dataset.sampleNum;
       if (file) {
         const zipFile = new admZip(fs.readFileSync(file.path));
-        sampleNum = zipFile.getEntries().length;
-        if (dataset.type === "entertain") {
-          if (!zipFile.getEntry("entertain.json")) {
-            fs.unlinkSync(file.path);
-            res.status(400).send({error: "娱乐数据集应包含名为entertain.json的文件"});
-            return;
-          }
-          sampleNum -= 1;
-        }
+        sampleNum = zipFile.getEntries().filter((zipEntry) => isValid(zipEntry.entryName, dataType)).length;
       }
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {
@@ -122,11 +105,7 @@ module.exports = {
       dataset = await dataset.update({name, description, sampleNum, dataType, labelType, labelInfo: labelInfoParsed, segments});
       if (file) {
         const path = `./data/datasets/${dataset.id}`;
-        if (!saveZip(path, file)) {
-          await dataset.destroy();
-          res.status(400).send({error: "数据集文件格式错误"});
-          return;
-        }
+        saveZip(path, file, dataType);
       }
       res.send(dataset);
     } catch(err) {
@@ -170,7 +149,6 @@ module.exports = {
             segments !== null && {segments}
           ]
         },
-        // TODO: add count of labels with validated = true as labelerNum
         attributes: {
           include: [[
             sequelize.literal(`(
@@ -192,7 +170,12 @@ module.exports = {
   },
   async show (req, res) {
     try {
-      const dataset = await Dataset.findByPk(req.params.datasetId);
+      const dataset = (await Dataset.findByPk(req.params.datasetId)).toJSON();
+      const path = `./data/datasets/${dataset.id}`;
+      extractZip(path);
+      const settingsPath = `${path}/settings.json`;
+      if (fs.existsSync(settingsPath))
+        dataset.settings = JSON.parse(fs.readFileSync(settingsPath));
       res.send(dataset);
     } catch(err) {
       console.error(err);
@@ -205,7 +188,7 @@ module.exports = {
       const dataset = await Dataset.findByPk(datasetId);
       const path = `./data/datasets/${dataset.id}`;
       extractZip(path);
-      const name = fs.readdirSync(path).find((name) => name.startsWith(sampleId + "."));
+      const name = JSON.parse(fs.readFileSync(`${path}_names.json`))[sampleId];
       if (!name) {
         res.send({});
         return;

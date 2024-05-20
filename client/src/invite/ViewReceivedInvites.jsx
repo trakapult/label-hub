@@ -43,7 +43,6 @@ function ViewReceivedInvites () {
               <th>发送者</th>
               <th>奖金</th>
               <th>罚金</th>
-              <th>截止日期</th>
             </tr>
           </thead>
           <tbody>
@@ -52,7 +51,6 @@ function ViewReceivedInvites () {
                 <td>{invite.dataset.admin}</td>
                 <td>{invite.reward}</td>
                 <td>{invite.penalty}</td>
-                <td>{new Date(invite.deadline).toLocaleString()}</td>
                 {invite.status === "等待回复" && (
                   <td>
                     <div className="btn-group">

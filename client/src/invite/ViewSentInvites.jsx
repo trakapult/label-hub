@@ -43,7 +43,6 @@ function ViewSentInvites ({datasetId}) {
               <th>接收者</th>
               <th>奖金</th>
               <th>罚金</th>
-              <th>截止日期</th>
               <th>状态</th>
               <th>操作</th>
             </tr>
@@ -54,7 +53,6 @@ function ViewSentInvites ({datasetId}) {
                 <td>{invite.receiver}</td>
                 <td>{invite.reward}</td>
                 <td>{invite.penalty}</td>
-                <td>{new Date(invite.deadline).toLocaleString()}</td>
                 <td>{invite.status}</td>
                 <td>
                   <div

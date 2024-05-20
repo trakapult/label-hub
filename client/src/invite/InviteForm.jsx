@@ -15,14 +15,13 @@ function InviteForm ({datasetId}) {
     try {
       const reward = e.target.reward.value;
       const penalty = e.target.penalty.value;
-      const deadline = e.target.deadline.value;
       if (receivers.length === 0) {
         setError("请选择至少一个用户");
         return;
       }
       for (const receiver of receivers) {
         console.log(receiver);
-        const invite = {datasetId, receiver, reward, penalty, deadline};
+        const invite = {datasetId, receiver, reward, penalty};
         const res = await InviteService.create(state.token, invite);
         console.log(res.data);
       }
@@ -89,10 +88,6 @@ function InviteForm ({datasetId}) {
             <input className="form-control" type="number" id="reward" defaultValue={5} required />
             <span className="input-group-text">罚金</span>
             <input className="form-control" id="penalty" defaultValue={0} required />
-            <span className="input-group-text">期限</span>
-            <input className="form-control" type="date" id="deadline" defaultValue={
-              new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
-            } required />
           </div>
           <div className="form-text mb-3">接受邀请后，对于每个样本，在期限内正确标注将在原奖励基础上发放奖金，否则将扣除罚金</div>
           <button className="btn btn-primary mb-3" type="submit">发送邀请</button>

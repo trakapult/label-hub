@@ -3,14 +3,14 @@ const { Invite, Dataset } = require('../models');
 module.exports = {
   async create (req, res) {
     try {
-      const {datasetId, receiver, reward, penalty, deadline} = req.body;
+      const {datasetId, receiver, reward, penalty} = req.body;
       const dataset = await Dataset.findByPk(datasetId);
       if (req.user.name !== dataset.admin) {
         res.status(403).send({error: "您无权发送此邀请"});
         return;
       }
       let invite = await Invite.findOne({where: {datasetId, receiver}});
-      if (!invite) invite = await Invite.create({datasetId, receiver, reward, penalty, deadline});
+      if (!invite) invite = await Invite.create({datasetId, receiver, reward, penalty});
       res.send(invite);
     }
     catch(err) {
