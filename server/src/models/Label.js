@@ -15,8 +15,8 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: 0,
       validate: { min: 0 },
     },
-    correctNum: {
-      type: DataTypes.INTEGER,
+    accSum: {
+      type: DataTypes.FLOAT,
       defaultValue: 0,
       validate: { min: 0 },
     },
@@ -31,8 +31,8 @@ module.exports = (sequelize, DataTypes) => {
       }
     },
     validate: {
-      validateCorrectNum() {
-        if (this.correctNum > this.labeledNum) {
+      validateAccSum() {
+        if (this.accSum > this.labeledNum) {
           throw new Error("Correct number exceeds labeled number");
         }
       }
@@ -55,18 +55,17 @@ module.exports = (sequelize, DataTypes) => {
     const dataset = await Dataset.findByPk(label.datasetId);
     const count = await Label.count({where: {
       datasetId: label.datasetId,
-      labeledNum: dataset.sampleNum,
       validated: true
     }});
     if (count === 1) {
-      settleUploadReward(dataset);
+      await settleUploadReward(dataset);
     } else if (count === 0) {
-      retrieveUploadReward(dataset);
+      await retrieveUploadReward(dataset);
     }
     if (label.validated) {
-      settleLabelPayment(label, dataset);
+      await settleLabelPayment(label, dataset);
     } else {
-      retrieveLabelPayment(label, dataset);
+      await retrieveLabelPayment(label, dataset);
     }
   });
   Label.afterDestroy(async (label) => {
@@ -74,13 +73,13 @@ module.exports = (sequelize, DataTypes) => {
     const dataset = await Dataset.findByPk(label.datasetId);
     const count = await Label.count({where: {
       datasetId: label.datasetId,
-      labeledNum: dataset.sampleNum
+      validated: true
     }});
     if (count === 0) {
-      retrieveUploadReward(dataset);
+      await retrieveUploadReward(dataset);
     }
     if (dataset.type !== "entertain") {
-      retrieveLabelPayment(label, dataset);
+      await retrieveLabelPayment(label, dataset);
     }
   });
   return Label;

@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
       datasetId: invite.datasetId,
       labeler: invite.receiver
     }});
-    settleInvitePayment(invite, label, dataset);
+    await settleInvitePayment(invite, label, dataset);
   });
   return Invite;
 };

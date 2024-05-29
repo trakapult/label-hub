@@ -1,5 +1,5 @@
-const multer = require('multer');
-const upload = multer({dest: 'uploads/'});
+const multer = require("multer");
+const upload = multer({dest: "uploads/"});
 
 const AuthControllerPolicy = require("./policies/AuthControllerPolicy");
 const AuthController = require("./controllers/AuthController");

@@ -26,7 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     password: DataTypes.STRING,
     points: {
       type: DataTypes.INTEGER,
-      defaultValue: config.points.initial,
+      defaultValue: config.rewardSystem.initialPoints,
       validate: {min: 0}
     }
   }, {

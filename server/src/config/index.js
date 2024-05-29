@@ -16,9 +16,12 @@ module.exports = {
   auth: {
     jwtSecret: process.env.JWT_SECRET || "secret"
   },
-  points: {
-    initial: 1000,
-    noSegments: 1,
-    segments: 2
+  rewardSystem: {
+    initialPoints: 1000,
+    uploadPay: 20,
+    noSegmentsPay: 1,
+    segmentsPay: 2,
+    correctPay: 2,
+    accRatio: 0.999,
   }
 };

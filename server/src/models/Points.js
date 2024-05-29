@@ -32,17 +32,11 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE"
     });
   };
-  Points.afterCreate(async (points) => {
+  Points.afterSave(async (points) => {
     const { User } = points.sequelize.models;
     const user = await User.findOne({where: {name: points.receiver}});
-    console.log("Ceate", user.points, points.amount);
-    await user.update({points: Math.max(0, user.points + points.amount)});
-  });
-  Points.afterUpdate(async (points) => {
-    const { User } = points.sequelize.models;
-    const user = await User.findOne({where: {name: points.receiver}});
-    console.log("Update", user.points, points._previousDataValues.amount, points.amount, Math.max(0, user.points - points._previousDataValues.amount + points.amount));
-    await user.update({points: Math.max(0, user.points - points._previousDataValues.amount + points.amount)});
+    const pointsChange = points.amount - (points._previousDataValues.amount || 0);
+    await user.update({points: Math.max(0, user.points + pointsChange)});
   });
   Points.afterDestroy(async (points) => {
     const { User } = points.sequelize.models;

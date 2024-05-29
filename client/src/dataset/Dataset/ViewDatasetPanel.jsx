@@ -264,7 +264,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
           {dataset.type === "entertain" && (
             <div className="row justify-content-center mb-3">
               <div className="col-md-6">
-                <Users title="排行榜" service={LabelService.getLabelRecords} params={dataset.id} attrNames={["标注者", "得分"]} attrs={["labeler", "correctNum"]} />
+                <Users title="排行榜" service={LabelService.getLabelRecords} params={dataset.id} attrNames={["标注者", "得分"]} attrs={["labeler", "accSum"]} />
               </div>
             </div>
           )}

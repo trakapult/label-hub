@@ -1,3 +1,5 @@
+const config = require("../config");
+
 module.exports = (sequelize, DataTypes) => {
   const Dataset = sequelize.define("Dataset", {
     name: DataTypes.STRING,
@@ -49,16 +51,17 @@ module.exports = (sequelize, DataTypes) => {
       onDelete: "CASCADE",
     });
   };
-  Dataset.beforeSave(async (dataset) => {
+  Dataset.beforeSave((dataset) => {
     if (!dataset.reward) {
       if (dataset.segments) {
-        dataset.reward = 2;
+        dataset.reward = config.rewardSystem.segmentsPay;
       } else {
-        dataset.reward = 1;
+        dataset.reward = config.rewardSystem.noSegmentsPay;
       }
     }
     if (!dataset.deadline) {
-      dataset.deadline = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+      const ONE_WEEK = 7 * 24 * 60 * 60 * 1000;
+      dataset.deadline = new Date(Date.now() + ONE_WEEK).toISOString().split("T")[0];
     }
   });
   Dataset.afterUpdate(async (dataset) => {
@@ -69,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
       reason: "upload"
     }});
     if (points) {
-      await points.update({amount: dataset.type === "public" ? 20 * dataset.sampleNum : 0});
+      await points.update({amount: dataset.type === "public" ? config.rewardSystem.uploadPay * dataset.sampleNum : 0});
     }
   });
   Dataset.afterDestroy(async (dataset) => {

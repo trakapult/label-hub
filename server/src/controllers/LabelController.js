@@ -30,7 +30,7 @@ module.exports = {
         if (fs.existsSync(settingsPath)) {
           const answers = JSON.parse(fs.readFileSync(settingsPath)).answers;
           if (answers) {
-            label.correctNum = Object.keys(labelData).filter((key) => answers[key] === labelData[key]).length;
+            label.accSum = Object.keys(labelData).filter((key) => answers[key] === labelData[key]).length;
           }
         }
       }
