@@ -39,7 +39,7 @@ function DatasetForm ({dataset}) {
             type="text"
             id="categories"
             placeholder="类别1,类别2,...,类别n"
-            defaultValue={dataset.labelType === "categorical" ? dataset.labelInfo.join(",") : ""}
+            defaultValue={(dataset && dataset.labelType === "categorical") ? dataset.labelInfo.join(",") : ""}
             required
           />
         </div>
@@ -52,7 +52,7 @@ function DatasetForm ({dataset}) {
             type="number"
             id="min"
             placeholder="最小值"
-            defaultValue={dataset.labelType === "numerical" ? dataset.labelInfo.min : ""}
+            defaultValue={(dataset && dataset.labelType === "numerical") ? dataset.labelInfo.min : ""}
             required
           />
           <input
@@ -60,7 +60,7 @@ function DatasetForm ({dataset}) {
             type="number" 
             id="max"
             placeholder="最大值"
-            defaultValue={dataset.labelType === "numerical" ? dataset.labelInfo.max : ""}
+            defaultValue={(dataset && dataset.labelType === "numerical") ? dataset.labelInfo.max : ""}
             required
           />
         </div>
