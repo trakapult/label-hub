@@ -18,12 +18,14 @@ module.exports = {
       deadline: Joi.date().required()
     });
     let {error} = schema.validate(req.body);
-    if (req.body.labelType === "numerical" && !error) {
+    console.log("期限：", new Date(req.body.deadline), new Date());
+    if (!error && req.body.labelType === "numerical") {
       const {min, max} = JSON.parse(req.body.labelInfo);
       if (min > max) {
         error = "min应小于等于max";
       }
-    } else if (new Date(req.body.deadline) < new Date()) {
+    }
+    if (!error && new Date(req.body.deadline) < new Date()) {
       error = "期限应晚于当前时间";
     }
     if (error) {

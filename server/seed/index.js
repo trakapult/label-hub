@@ -1,8 +1,9 @@
-const { sequelize, User, Dataset } = require("../src/models");
+const { sequelize, User, Dataset, Invite } = require("../src/models");
 const fs = require("fs");
 const admZip = require("adm-zip");
 const users = require("./users.json");
 const datasets = require("./datasets.json");
+const invites = require("./invites.json");
 
 const allowedFileTypes = ["txt", "jpg", "jpeg", "png", "bmp", "webp", "mp3", "wav", "flac"];
 
@@ -15,16 +16,22 @@ const isValid = (entryName) => {
 async function seed () {
   await sequelize.sync({force: true});
   console.log("Database synced");
+  
   for (const user of users) {
     await User.create(user);
   }
   // await User.bulkCreate(users);
   console.log("Users created");
+  
   for (const dataset of datasets) {
     await Dataset.create(dataset);
   }
-  // await Dataset.bulkCreate(datasets);
   console.log("Datasets created");
+
+  for (const invite of invites) {
+    await Invite.create(invite);
+  }
+  console.log("Invites created");
 
   if (fs.existsSync("./data"))
     fs.rmSync("./data", {recursive: true});

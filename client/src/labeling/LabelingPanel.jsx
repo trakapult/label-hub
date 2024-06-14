@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import NumericalLabels from "./Labels/NumericalLabels";
+import InputNumericalLabels from "./Labels/InputNumericalLabels";
 import CategoricalLabels from "./Labels/CategoricalLabels";
 import TextualLabels from "./Labels/TextualLabels";
 import SaveButton from "./SaveButton";
@@ -37,8 +38,8 @@ function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabe
     <>
       <div className="row justify-content-center mb-3">
         <div className="col-md-6 border rounded-end overflow-auto" style={{maxHeight: height}}>
-          <div className="img-container">
-            {dataType === "text" && <p>{file}</p>}
+          <div className="sample-container">
+            {dataType === "text" && <p style={{whiteSpace: "pre-wrap", textAlign: "left"}}>{file}</p>}
             {dataType === "image" && <img src={`data:image;base64,${btoa(file)}`} alt="sample" />}
             {dataType === "audio" && <audio src={`data:audio/wav;base64,${btoa(file)}`} controls />}
           </div>
@@ -46,9 +47,15 @@ function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabe
       </div>
       <div className="row justify-content-center mb-3">
         <div className="col-md-6">
-          {labelType === "numerical" &&
-            <NumericalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
+          {labelType === "numerical" && labelInfo.max - labelInfo.min <= 10 &&
+            <NumericalLabels sampleId={sampleId} labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
           }
+          {labelType === "numerical" && labelInfo.max - labelInfo.min > 10 && (
+            <form className="row justify-content-center" onSubmit={(e) => {e.preventDefault(); saveLabel(textualLabel); setSaved(true);}}>
+              <InputNumericalLabels sampleId={sampleId} labelInfo={labelInfo} curLabel={curLabel} saveLabel={(e) => {setTextualLabel(e); setSaved(false);}} />
+              <SaveButton saved={saved} />
+            </form>
+          )}
           {labelType === "categorical" && (
             <CategoricalLabels labelInfo={labelInfo} curLabel={curLabel} saveLabel={saveLabel} />
           )}

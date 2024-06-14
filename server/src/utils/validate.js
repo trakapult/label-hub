@@ -1,4 +1,5 @@
 const fs = require("fs");
+const config = require("../config");
 
 const equal = (sa, sb, threshold = -1) => {
   if (sa.label !== sb.label) return false;
@@ -15,12 +16,12 @@ function getThreshold(dataset) {
   if (!dataset.segments) return -1;
   const labelInfo = JSON.parse(dataset.labelInfo);
   if (dataset.dataType === "text") return 0;
-  if (dataset.dataType === "image") return Math.min(labelInfo.width, labelInfo.height) * 0.05;
-  if (dataset.dataType === "audio") return 0.05;
+  if (dataset.dataType === "image") return Math.min(labelInfo.width, labelInfo.height) * config.rewardSystem.threshold;
+  if (dataset.dataType === "audio") return config.rewardSystem.threshold;
   return -1;
 }
 
-function getAnswer_(data, weights, dataset) {
+function getAnswer(data, weights, dataset) {
   const answer = {};
   const threshold = getThreshold(dataset);
   if (threshold === -1) {
@@ -56,16 +57,27 @@ function getAnswer_(data, weights, dataset) {
       }
       return sa;
     }
+    const uniq = [];
     for (let i = 0; i < b.length; i++) {
       let found = false;
-      for (let j = 0; j < a.length; j++) {
-        if (equal(a[j].value, b[i], threshold)) {
-          a[j] = mergeSingle(a[j], b[i]);
+      for (let j = 0; j < uniq.length; j++) {
+        if (equal(uniq[j], b[i], threshold)) {
           found = true;
           break;
         }
       }
-      if (!found) a.push({value: b[i], weight: weights[idx], idx});
+      if (!found) uniq.push(b[i]);
+    }
+    for (let i = 0; i < uniq.length; i++) {
+      let found = false;
+      for (let j = 0; j < a.length; j++) {
+        if (equal(a[j].value, uniq[i], threshold)) {
+          a[j] = mergeSingle(a[j], uniq[i]);
+          found = true;
+          tmpreak;
+        }
+      }
+      if (!found) a.push({value: uniq[i], weight: weights[idx], idx});
     }
     return a;
   }
@@ -88,11 +100,11 @@ function getAnswer_(data, weights, dataset) {
   return answer;
 }
 
-async function getAnswer(labels, dataset) {
+async function getDataAndWeights(labels, dataset) {
   const { User } = require("../models");
   const data = {}, weights = [];
   for (const label of labels) {
-    const labelData = JSON.parse(fs.readFileSync(`./data/${label.datasetId}/${label.labeler}.json`));
+    const labelData = JSON.parse(fs.readFileSync(`./data/labels/${label.datasetId}/${label.labeler}.json`));
     for (const sampleId in labelData) {
       if (!data[sampleId]) data[sampleId] = [];
       data[sampleId].push(labelData[sampleId]);
@@ -101,12 +113,13 @@ async function getAnswer(labels, dataset) {
     const weight = Math.log10(user.points + 1);
     weights.push(weight);
   }
-  return getAnswer_(data, weights, dataset);
+  return {data, weights};
 }
 
 function getAcc(a, b, threshold = -1) {
+  console.log(a, b, threshold);
   if (threshold === -1) {
-    return a === b ? 1 : 0;
+    return a == b ? 1 : 0;
   }
   let acc = 0;
   for (let i = 0; i < b.length; i++) {
@@ -121,24 +134,34 @@ function getAcc(a, b, threshold = -1) {
   return acc;
 }
 
-function getAccSum(answer, label, dataset) {
+function getAccSum(answer, labelData, dataset) {
   const threshold = getThreshold(dataset);
   let accSum = 0;
   for (const sampleId in answer) {
-    accSum += getAcc(answer[sampleId], label[sampleId], threshold);
+    accSum += getAcc(answer[sampleId], labelData[sampleId], threshold);
   }
   return accSum;
 }
 
 async function updateAccSum(labels, dataset) {
   const validLabels = labels.filter((label) => label.validated);
-  if (validLabels.length === 0)
+  const dirPath = `./data/labels/${dataset.id}`;
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath);
+  }
+  const path = `${dirPath}/correct_labels.json`;
+  if (validLabels.length === 0) {
+    fs.writeFileSync(path, JSON.stringify({}));
     return;
-  const answer = await getAnswer(validLabels, dataset);
+  }
+  const {data, weights} = getDataAndWeights(validLabels, dataset);
+  const answer = getAnswer(data, weights, dataset);
+  fs.writeFileSync(path, JSON.stringify(answer));
   for (const label of labels) {
-    const accSum = getAccSum(answer, label, dataset);
+    const labelData = JSON.parse(fs.readFileSync(`${dirPath}/${label.labeler}.json`));
+    const accSum = getAccSum(answer, labelData, dataset);
     await label.update({accSum});
   }
 }
 
-module.exports = { getAnswer_, getAnswer, getAcc, getAccSum, updateAccSum };
+module.exports = { getAnswer, getAcc, getAccSum, updateAccSum };

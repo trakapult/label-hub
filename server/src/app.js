@@ -15,7 +15,7 @@ require("./passport");
 routes(app);
 
 sequelize.sync().then(() => {
-  app.listen(config.port, () => {
+  app.listen(config.port, '0.0.0.0', () => {
     console.log(`Server started on port ${config.port}`)
   })
 }).catch((err) => {
@@ -26,7 +26,7 @@ const handleExpiredDatasets = require("./utils/handleExpiredDatasets");
 
 cron.schedule("0 0 * * *", () => {
   console.log("Handling expired datasets");
-  handleExpiredDatasets(new Date()).then(() => {
+  handleExpiredDatasets().then(() => {
     console.log("Expired datasets handled");
   }).catch((err) => {
     console.error(err);

@@ -20,10 +20,8 @@ function InviteForm ({datasetId}) {
         return;
       }
       for (const receiver of receivers) {
-        console.log(receiver);
         const invite = {datasetId, receiver, reward, penalty};
         const res = await InviteService.create(state.token, invite);
-        console.log(res.data);
       }
       setError("");
       e.target.querySelector("button").classList.remove("btn-primary");

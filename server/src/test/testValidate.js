@@ -1,4 +1,4 @@
-const { getAnswer_, getAcc } = require('./validate');
+const { getAnswer, getAcc } = require('../utils/validate');
 
 const data = {
   "sample1": [
@@ -16,7 +16,7 @@ const data = {
 const weights = [1, 1, 1];
 const threshold = 5;
 
-const answer = getAnswer_(data, weights, threshold);
+const answer = getAnswer(data, weights, threshold);
 console.log("Computed Answer:", answer);
 
 const acc1 = getAcc(answer["sample1"], data["sample1"][0], threshold);

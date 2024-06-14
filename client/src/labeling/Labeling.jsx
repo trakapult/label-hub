@@ -68,6 +68,7 @@ function Labeling () {
       let next = sampleId + 1;
       if (graph) {
         next = graph[sampleId]?.[label];
+        if (next === undefined) next = graph[sampleId];
         if (next === undefined) next = sampleId;
       }
       return next;
@@ -75,8 +76,11 @@ function Labeling () {
 
     const saveLabelData = (value) => {
       const oldLabel = labelData[sampleId];
-      const newLabel = value || oldLabel;
+      let newLabel = value || oldLabel;
       if (!newLabel) return;
+      if (Array.isArray(newLabel)) {
+        newLabel = newLabel.filter((s) => s.label !== "");
+      }
       let newLabelData = labelData;
       if (newLabel !== oldLabel) {
         newLabelData = {...labelData, [sampleId]: newLabel};
@@ -130,7 +134,6 @@ function Labeling () {
         </>
       );
     }
-    console.log(dataset);
     return (
       <>
         <div className="row justify-content-center">
@@ -138,14 +141,16 @@ function Labeling () {
             {dataset?.settings?.time &&
               <Timer minutes={dataset.settings.time} navigateTo={`/dataset/${datasetId}`} />
             }
-            <div className="progress mb-3">
-              <div
-                className="progress-bar bg-success"
-                style={{width: `${(sampleId + 1) / dataset.sampleNum * 100}%`}}
-              >
-                {sampleId + 1}/{dataset.sampleNum}
+            {!dataset?.settings?.graph &&
+              <div className="progress mb-3">
+                <div
+                  className="progress-bar bg-success"
+                  style={{width: `${(sampleId + 1) / dataset.sampleNum * 100}%`}}
+                >
+                  {sampleId + 1}/{dataset.sampleNum}
+                </div>
               </div>
-            </div>
+            }
           </div>
         </div>
         <View service={DatasetService.getFile} params={[datasetId, sampleId]} handleLoad={handleSampleLoad} />

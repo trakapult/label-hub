@@ -4,12 +4,17 @@ module.exports = (sequelize, DataTypes) => {
     datasetId: DataTypes.INTEGER,
     reason: {
       type: DataTypes.STRING,
-      validate: {isIn: [[
-        "upload",
-        "getLabelingReward", "payLabelingReward",
-        "getCorrectReward", "payCorrectReward",
-        "getInviteReward", "payInviteReward"
-      ]]},
+      validate: {
+        startsWith: (value) => {
+          if (value === "upload" || value === "labelGet" || value === "correctGet" || value === "inviteGet") {
+            return;
+          }
+          if (value.startsWith("labelPay ") || value.startsWith("correctPay ") || value.startsWith("invitePay ")) {
+            return;
+          }
+          throw new Error(`Invalid reason: ${value}`);
+        }
+      }
     },
     amount: DataTypes.INTEGER
   }, {

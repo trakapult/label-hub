@@ -21,7 +21,7 @@ const destroyPoints = async (receiver, datasetId, reason) => {
 }
 
 const settleUploadReward = async (dataset) => {
-  const amount = dataset.type === "public" ? config.rewardSystem.uploadPay * dataset.sampleNum : 0;
+  const amount = config.rewardSystem.uploadReward[dataset.type] * dataset.sampleNum;
   await savePoints(dataset.admin, dataset.id, "upload", amount);
 }
 
@@ -38,42 +38,48 @@ const validate = (label, dataset) => {
   if (!fs.existsSync(settingsPath))
     return true;
   const answers = JSON.parse(fs.readFileSync(settingsPath)).answers;
-  if (!answers)
-    return true;
+  console.log("验证标注", label.id, answers);
+  if (!answers) return true;
   const labelPath = `./data/labels/${dataset.id}/${label.labeler}.json`;
   assert(fs.existsSync(labelPath), `Label file ${labelPath} does not exist`);
   const labelData = JSON.parse(fs.readFileSync(labelPath));
+  console.log("labelData", labelData);
   const { getAccSum } = require("../utils/validate");
-  return getAccSum(answers, labelData, dataset) >= dataset.sampleNum * config.rewardSystem.accRatio;
+  const accSum = getAccSum(answers, labelData, dataset);
+  console.log("accSum", accSum, Object.keys(answers).length * config.rewardSystem.accRatio);
+  return accSum >= Object.keys(answers).length * config.rewardSystem.accRatio;
 }
 
 const settleLabelPayment = async (label, dataset) => {
   if (dataset.type === "entertain") {
     const amount = -dataset.reward * label.labeledNum;
-    await savePoints(label.labeler, label.datasetId, "getLabelingReward", amount, true);
+    await savePoints(label.labeler, label.datasetId, "labelGet", amount, true);
     return;
   }
   const { User } = require("../models");
   const admin = await User.findOne({where: {name: dataset.admin}});
-  const amount = Math.min(admin.points, dataset.reward * label.labeledNum + config.rewardSystem.correctPay * label.accSum);
-  await savePoints(label.labeler, label.datasetId, "getLabelingReward", amount);
-  await savePoints(dataset.admin, label.datasetId, "payLabelingReward", -amount);
+  const labelingReward = Math.min(admin.points, dataset.reward * label.labeledNum);
+  await savePoints(label.labeler, label.datasetId, "labelGet", labelingReward);
+  await savePoints(dataset.admin, label.datasetId, `labelPay ${label.labeler}`, -labelingReward);
+  const correctReward = Math.min(admin.points - labelingReward,  Math.ceil(config.rewardSystem.correctPay * label.accSum));
+  await savePoints(label.labeler, label.datasetId, "correctGet", correctReward);
+  await savePoints(dataset.admin, label.datasetId, `correctPay ${label.labeler}`, -correctReward);
 }
 
 const retrieveLabelPayment = async (label, dataset) => {
-  await destroyPoints(label.labeler, label.datasetId, "getLabelingReward");
-  await destroyPoints(dataset.admin, label.datasetId, "payLabelingReward");
+  await destroyPoints(label.labeler, label.datasetId, "labelGet");
+  await destroyPoints(dataset.admin, label.datasetId, `labelPay ${label.labeler}`);
 }
 
 const settleInvitePayment = async (invite, label, dataset) => {
   if (dataset.type === "entertain") return;
   const { User } = require("../models");
   const admin = await User.findOne({where: {name: dataset.admin}});
-  const accSum = label.accSum;
+  const accSum = label ? label.accSum : 0;
   const inaccSum = dataset.sampleNum - accSum;
-  const amount = Math.min(admin.points, invite.reward * label.accSum - invite.penalty * inaccSum);
-  await savePoints(invite.receiver, invite.datasetId, "getInviteReward", amount);
-  await savePoints(dataset.admin, invite.datasetId, "payInviteReward", -amount);
+  const amount = Math.min(admin.points, Math.ceil(invite.reward * accSum - invite.penalty * inaccSum));
+  await savePoints(invite.receiver, invite.datasetId, "inviteGet", amount);
+  await savePoints(dataset.admin, invite.datasetId, `invitePay ${invite.receiver}`, -amount);
 }
 
 module.exports = {

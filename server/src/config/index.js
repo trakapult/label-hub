@@ -16,12 +16,24 @@ module.exports = {
   auth: {
     jwtSecret: process.env.JWT_SECRET || "secret"
   },
+  user: {
+    showLimit: 100,
+  },
+  dataset: {
+    showLimit: 100,
+    imageMaxSize: 500 * 500,
+  },
   rewardSystem: {
     initialPoints: 1000,
-    uploadPay: 20,
+    uploadReward: {
+      "public": 20,
+      "private": 0,
+      "entertain": 5,
+    },
     noSegmentsPay: 1,
     segmentsPay: 2,
     correctPay: 2,
     accRatio: 0.999,
+    threshold: 0.05,
   }
 };

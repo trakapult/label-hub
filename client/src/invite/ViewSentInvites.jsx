@@ -27,7 +27,6 @@ function ViewSentInvites ({datasetId}) {
       const receiver = e.target.id;
       const res = await InviteService.delete(state.token, datasetId, receiver);
       setInvites(invites.filter((invite) => invite.receiver !== receiver));
-      console.log(res.data);
     } catch(err) {
       console.error(err);
       alert(err.response.data.error);

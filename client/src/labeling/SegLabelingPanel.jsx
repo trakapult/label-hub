@@ -1,12 +1,13 @@
 import NumericalLabels from "./Labels/NumericalLabels";
+import InputNumericalLabels from "./Labels/InputNumericalLabels";
 import CategoricalLabels from "./Labels/CategoricalLabels";
 import TextualLabels from "./Labels/TextualLabels";
 
 const height = 500;
 const colors = ["blue", "coral", "green", "salmon", "seagreen", "steelblue"];
-const hashMap = {}, hashMapLim = 20;
 
 /*
+const hashMap = {}, hashMapLim = 20;
 function getHash(label) {
   if (!label) return 0;
   if (hashMap[label] === undefined) {
@@ -30,13 +31,22 @@ function getColor(index, light=false) {
 
 function LabelingPanel({data, attrs, rows, labelType, labelInfo, saveLabel, curLabelData}) {
   const getLabels = (index) => {
-    if (labelType === "numerical") {
+    if (labelType === "numerical" && labelInfo.max - labelInfo.min <= 10) {
       return (
         <NumericalLabels
           labelInfo={labelInfo}
           curLabel={curLabelData[index].label}
           saveLabel={saveLabel(index)}
           formtext={false}
+        />
+      );
+    } else if (labelType === "numerical" && labelInfo.max - labelInfo.min > 10) {
+      return (
+        <InputNumericalLabels
+          index={index}
+          labelInfo={labelInfo}
+          curLabel={curLabelData[index].label}
+          saveLabel={saveLabel(index)}
         />
       );
     } else if (labelType === "categorical") {
@@ -62,7 +72,7 @@ function LabelingPanel({data, attrs, rows, labelType, labelInfo, saveLabel, curL
   return (
     <div className="row mb-2">
       <div className="col-md-6 border rounded-start overflow-auto" style={{maxHeight: height}}>
-        <div className="img-container">
+        <div className="sample-container">
           {data}
         </div>
       </div>

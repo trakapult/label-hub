@@ -72,7 +72,6 @@ function TextSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLab
 
   useEffect(() => {
     const segs = labelDataToSegments(curLabelData);
-    console.log("segs", segs);
     setSegments(segs);
     const sortedSegs = sort(segs);
     setSortedSegments(sortedSegs);
@@ -102,7 +101,6 @@ function TextSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLab
       }
     }
     if (!flag) newSegments.push({start, end, label});
-    console.log("newSegments", newSegments);
     setSegments(newSegments);
     const newSortedSegments = sort(newSegments);
     setSortedSegments(newSortedSegments);

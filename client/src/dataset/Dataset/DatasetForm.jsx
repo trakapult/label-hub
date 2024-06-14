@@ -4,7 +4,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import Error from "@/common/Error";
 import DatasetService from "../DatasetService";
 
-function EditDatasetPanel ({dataset}) {
+function DatasetForm ({dataset}) {
   const {state} = useAuthContext();
   const [error, setError] = useState("");
   const navigate = useNavigate();
@@ -15,6 +15,7 @@ function EditDatasetPanel ({dataset}) {
       document.getElementsByClassName("card-title")[0].textContent = "编辑数据集";
       document.getElementById("name").value = dataset.name;
       document.getElementById("description").value = dataset.description;
+      document.getElementById("type").value = dataset.type;
       document.getElementById("dataType").value = dataset.dataType;
       document.getElementById("labelType").value = dataset.labelType;
       document.getElementById("segments").checked = dataset.segments;
@@ -179,4 +180,4 @@ function EditDatasetPanel ({dataset}) {
   );
 }
 
-export default EditDatasetPanel;
+export default DatasetForm;

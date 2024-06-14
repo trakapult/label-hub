@@ -34,6 +34,7 @@ module.exports = {
           }
         }
       }
+      label.changed("labeledNum", true);
       await label.save();
       res.send(label);
     }
@@ -83,7 +84,7 @@ module.exports = {
     try {
       const {datasetId} = req.params;
       const dataset = await Dataset.findByPk(datasetId);
-      if (dataset.type !== "public" && req.user.name !== dataset.admin) {
+      if (dataset.type === "private" && req.user.name !== dataset.admin) {
         res.status(403).send({error: "您无权访问这些标注记录"});
         return;
       }

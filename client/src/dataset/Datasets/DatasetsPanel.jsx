@@ -3,7 +3,6 @@ import DatasetService from "../DatasetService";
 import DatasetCard from "../Dataset/DatasetCard";
 
 function DatasetsPanel ({search, selections}) {
-  console.log("selections", JSON.stringify(selections));
   const handleLoad = (datasets) => {
     const subsets = [[], [], []];
     datasets.forEach((dataset, index) => {

@@ -47,7 +47,7 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     setAreas(a);
     fillAreas(a);
     setSaved(curLabelData ? true : false);
-  }, [sampleId, fileInfo, curLabelData]);
+  }, [sampleId, fileInfo?.width, fileInfo?.height, curLabelData]);
 
   useEffect(() => {
     canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;

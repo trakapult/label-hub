@@ -24,8 +24,7 @@ function ViewReceivedInvites () {
 
   const handleResponse = async (datasetId, response) => {
     try {
-      const res = await InviteService.respond(state.token, datasetId, response);
-      console.log(res.data);
+      await InviteService.respond(state.token, datasetId, response);
       const status = response === "accept" ? "已接受" : response === "reject" ? "已拒绝" : "等待回复";
       setInvites(invites.map((invite) => invite.datasetId === datasetId ? {...invite, status} : invite));
     } catch(err) {
@@ -40,14 +39,17 @@ function ViewReceivedInvites () {
         <table className="table table-striped border text-center">
           <thead>
             <tr>
-              <th>发送者</th>
+              <th>数据集</th>
+              <th>管理员</th>
               <th>奖金</th>
               <th>罚金</th>
+              <th>操作</th>
             </tr>
           </thead>
           <tbody>
             {invites.map((invite) => (
-              <tr key={invite.dataset.admin}>
+              <tr key={invite.datasetId}>
+                <td>{invite.dataset.name}</td>
                 <td>{invite.dataset.admin}</td>
                 <td>{invite.reward}</td>
                 <td>{invite.penalty}</td>

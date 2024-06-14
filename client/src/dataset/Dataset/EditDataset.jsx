@@ -1,7 +1,7 @@
 import { useAuthContext } from "@/context/AuthContext";
 import { useParams } from 'react-router-dom';
 import View from "@/view/View";
-import EditDatasetPanel from "./EditDatasetPanel";
+import DatasetForm from "./DatasetForm";
 import Error from "@/common/Error";
 import DatasetService from "../DatasetService";
 
@@ -15,7 +15,7 @@ function EditDataset () {
         <div className="row justify-content-center">
           <div className="col-md-8">
             {error && <Error error={error} />}
-            {!error && <EditDatasetPanel dataset={dataset} />}
+            {!error && <DatasetForm dataset={dataset} />}
           </div>
         </div>
       </div>

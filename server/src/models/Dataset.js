@@ -72,7 +72,7 @@ module.exports = (sequelize, DataTypes) => {
       reason: "upload"
     }});
     if (points) {
-      await points.update({amount: dataset.type === "public" ? config.rewardSystem.uploadPay * dataset.sampleNum : 0});
+      await points.update({amount: config.rewardSystem.uploadReward[dataset.type] * dataset.sampleNum});
     }
   });
   Dataset.afterDestroy(async (dataset) => {

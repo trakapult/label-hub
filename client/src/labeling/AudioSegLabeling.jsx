@@ -70,8 +70,8 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     const duration = fileInfo.duration;
     const canvasWidth = canvas.getBoundingClientRect().width;
     const labelData = segments.map(({start, end, label}) => ({
-      start: (start - margin) / canvasWidth * duration,
-      end: (end - margin) / canvasWidth * duration,
+      start: Math.max((start - margin) / canvasWidth * duration, 0),
+      end: Math.min((end - margin) / canvasWidth * duration, duration),
       label
     }));
     return labelData;
@@ -79,6 +79,7 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
 
   useEffect(() => {
     drawWave(file, waveRef.current, canvasRef.current);
+    setCanvas(canvasRef.current);
   }, [file]);
 
   useEffect(() => {
@@ -86,13 +87,7 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     setSegments(s);
     fillSegments(s);
     setSaved(curLabelData ? true : false);
-  }, [sampleId, fileInfo, curLabelData]);
-
-  useEffect(() => {
-    canvasRef.current.width = canvasRef.current.getBoundingClientRect().width;
-    canvasRef.current.height = canvasHeight;
-    setCanvas(canvasRef.current);
-  }, [canvasRef]);
+  }, [sampleId, fileInfo?.duration, curLabelData, canvas?.width]);
 
   setInterval(() => {
     const audioElement = audioRef.current;

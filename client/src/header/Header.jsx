@@ -13,7 +13,9 @@ function Header() {
         <div className="container-fluid">
           <div className="navbar-nav">
             <a className="nav-link active" href="/">LabelHub</a>
-            <a className="nav-link" href="/create">创建数据集</a>
+            {state.isLoggedIn && (
+              <a className="nav-link" href="/create">创建数据集</a>
+            )}
           </div>
           {!state.isLoggedIn && (
             <div className="navbar-nav">

@@ -23,7 +23,7 @@ class CacheManager {
       // const blobUrl = this.cache.get(key).data.file;
       // URL.revokeObjectURL(blobUrl);
       this.cache.delete(key);
-      console.log(`Cache deleted: ${key}`);
+      // console.log(`Cache deleted: ${key}`);
     });
   }
 }

@@ -38,10 +38,10 @@ export default {
   async getFile(token, datasetId, sampleId) {
     let res = null;
     if (cacheManager.isCached(sampleId)) {
-      console.log(`Cache hit: ${sampleId}`);
+      // console.log(`Cache hit: ${sampleId}`);
       res = cacheManager.getCachedFile(sampleId);
     } else {
-      console.log(`Cache miss: ${sampleId}`);
+      // console.log(`Cache miss: ${sampleId}`);
       res = await api(token).get(`file/${datasetId}/${sampleId}`);
       cacheManager.cacheFile(sampleId, res);
     }

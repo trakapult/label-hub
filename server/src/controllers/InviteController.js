@@ -39,7 +39,7 @@ module.exports = {
     try {
       const invites = await Invite.findAll({
         where: {receiver: req.user.name},
-        include: [{model: Dataset, as: "dataset", attributes: ["admin"]}],
+        include: [{model: Dataset, as: "dataset", attributes: ["name", "admin"]}],
         order: [["updatedAt", "DESC"]]
       });
       res.send(invites);
@@ -67,14 +67,12 @@ module.exports = {
     try {
       const {datasetId} = req.params;
       const {response} = req.body;
-      console.log(datasetId, response);
       let invite = await Invite.findOne({where: {datasetId, receiver: req.user.name}});
       if (!invite) {
         res.status(404).send({error: "未找到邀请"});
         return;
       }
       const status = response === "accept" ? "已接受" : response === "reject" ? "已拒绝" : "等待回复";
-      console.log("status", status);
       invite.status = status;
       await invite.save();
       res.send(invite);

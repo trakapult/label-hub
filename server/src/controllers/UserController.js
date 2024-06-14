@@ -1,5 +1,6 @@
 const { User } = require("../models");
 const { Op } = require("sequelize");
+const config = require("../config");
 
 module.exports = {
   async showAll (req, res) {
@@ -8,7 +9,7 @@ module.exports = {
       const users = await User.findAll({
         where: {name: {[Op.like]: `%${search}%`}},
         order: [["points", "DESC"]],
-        limit: 100
+        limit: config.user.showLimit
       });
       res.send(users);
     } catch(err) {

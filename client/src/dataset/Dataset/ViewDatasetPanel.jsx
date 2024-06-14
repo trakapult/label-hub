@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "@/context/AuthContext";
 import View from "@/view/View";
 import Users from "@/user/Users";
 import DeleteDataset from "./DeleteDataset";
 import InviteForm from "@/invite/InviteForm";
 import ViewSentInvites from "@/invite/ViewSentInvites";
+import UserService from "@/user/UserService";
 import DatasetService from "../DatasetService";
 import LabelService from "@/labeling/LabelService";
 import Popup from "@/common/Popup";
@@ -39,6 +40,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
       return null;
     if (labels.length === 0)
       return <div className="mb-3">暂无标注记录</div>;
+    
     const downloadFile = (content, filename) => {
       const blob = new Blob([content], {type: "application/json"});
       const url = URL.createObjectURL(blob);
@@ -47,6 +49,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
       a.download = filename;
       a.click();
     }
+    
     const download = async (datasetId, labeler) => {
       try {
         const res = await LabelService.getLabelData(state.token, datasetId, labeler, true);
@@ -56,20 +59,9 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
         alert(err.response.data.error);
       }
     }
-    const downloadAll = async (datasetId) => {
-      try {
-        const record = {};
-        for (const label of labels) {
-          const res = await LabelService.getLabelData(state.token, datasetId, label.labeler, true);
-          record[label.labeler] = res.data;
-        }
-        downloadFile(JSON.stringify(record), `${datasetId}.json`);
-      } catch (err) {
-        console.error(err);
-        alert(err.response.data.error);
-      }
-    }
+    
     const labeledSum = labels.reduce((sum, label) => sum + label.labeledNum, 0);
+    
     return (
       <>
         整体标注进度：
@@ -85,16 +77,16 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
               <tr>
                 <th>标注者</th>
                 <th>进度</th>
-                <th>已验证</th>
+                <th>通过验证</th>
                 <th>开始时间</th>
                 <th>更新时间</th>
                 <th>
                   <button
-                    className="btn btn-primary btn-sm"
+                    className={"btn btn-primary btn-sm" + (dataset.settled ? "" : " disabled")}
                     type="button"
-                    onClick={() => downloadAll(dataset.id)}
+                    onClick={() => download(dataset.id, "correct_labels")}
                   >
-                    下载全部
+                    下载正确答案
                   </button>
                 </th>
               </tr>
@@ -133,7 +125,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
     return (
       <div className="row justify-content-center">
           <div className="col-md-6 border rounded overflow-auto" style={{maxHeight: height}}>
-            <div className="img-container">
+            <div className="sample-container">
               {dataset.dataType === "text" && <p>{file}</p>}
               {dataset.dataType === "image" && <img src={`data:image;base64,${btoa(file)}`} alt="sample" />}
               {dataset.dataType === "audio" && <audio src={`data:audio/wav;base64,${btoa(file)}`} controls />}
@@ -142,7 +134,23 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
       </div>
     );
   }
-  console.log(dataset.deadline, typeof dataset.deadline);
+  useEffect(() => {
+    const disableButton = async () => {
+      if (dataset.settled)
+        return true;
+      if (dataset.type === "entertain") {
+        const res = await UserService.get(state.token, state.user.name);
+        const points = res.data.points;
+        if (points < dataset.reward * dataset.sampleNum)
+          return true;
+      }
+      return false;
+    }
+    disableButton().then((disabled) => {
+      if (disabled)
+        document.getElementById("enter").disabled = true;
+    });
+  });
 
   return (
     <>
@@ -261,7 +269,7 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
               <View service={DatasetService.getFile} params={[dataset.id, 0]} handleLoad={handleSampleLoad} />
             </>
           )}
-          {dataset.type === "entertain" && (
+          {dataset.type === "entertain" && dataset?.settings?.answers && (
             <div className="row justify-content-center mb-3">
               <div className="col-md-6">
                 <Users title="排行榜" service={LabelService.getLabelRecords} params={dataset.id} attrNames={["标注者", "得分"]} attrs={["labeler", "accSum"]} />
@@ -270,8 +278,9 @@ function ViewDatasetPanel ({dataset, buttonText, handleClick}) {
           )}
           <div className="text-center mt-3">
             <button
-              className={"btn btn-primary" + (new Date(dataset.deadline) < new Date() ? " disabled" : "")}
+              className="btn btn-primary"
               type="button"
+              id="enter"
               onClick={() => handleClick(dataset)}
             >
               {buttonText}

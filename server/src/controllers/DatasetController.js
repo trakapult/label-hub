@@ -1,4 +1,4 @@
-const { Dataset, } = require("../models");
+const { Dataset } = require("../models");
 const { Op }  = require("sequelize");
 const sequelize = require("sequelize");
 const fs = require("fs");
@@ -7,6 +7,7 @@ const sharp = require("sharp");
 const ffmpeg = require("fluent-ffmpeg");
 const ffprobe = require("ffprobe-static");
 ffmpeg.setFfprobePath(ffprobe.path);
+const config = require("../config");
 
 const allowedFileTypes = {
   text: ["txt"],
@@ -41,6 +42,33 @@ const extractZip = (path) => {
   if (fs.existsSync(path)) return;
   const zipFile = new admZip(fs.readFileSync(path + ".zip"));
   zipFile.extractAllTo(path, true);
+  const settings = JSON.parse(fs.readFileSync(`${path}/settings.json`));
+  const names = JSON.parse(fs.readFileSync(`${path}_names.json`));
+  const ids = {};
+  for (const key in names)
+    ids[names[key]] = parseInt(key);
+  if (settings.graph) {
+    const graph = settings.graph, graphWithIds = {};
+    for (const key in graph) {
+      const newKey = ids[key];
+      if (typeof graph[key] === "object") {
+        const newValues = {};
+        for (const value in graph[key])
+          newValues[value] = ids[graph[key][value]];
+        graphWithIds[newKey] = newValues;
+      } else {
+        graphWithIds[newKey] = ids[graph[key]];
+      }
+    }
+    settings.graph = graphWithIds;
+  }
+  if (settings.answers) {
+    const answers = settings.answers, answersWithIds = {};
+    for (const key in answers)
+      answersWithIds[ids[key]] = answers[key];
+    settings.answers = answersWithIds;
+  }
+  fs.writeFileSync(`${path}/settings.json`, JSON.stringify(settings));
 };
 
 const removeFiles = (path) => {
@@ -154,13 +182,13 @@ module.exports = {
             sequelize.literal(`(
               SELECT COUNT(*)
               FROM "Labels"
-              WHERE "Labels"."datasetId" = "Dataset"."id" AND "Labels"."validated" = true)`
-            ),
+              WHERE "Labels"."datasetId" = "Dataset"."id" AND "Labels"."validated" = true
+            )`),
             "labelerNum"
           ]]
         },
         order: [["createdAt", "DESC"]],
-        limit: 100
+        limit: config.dataset.showLimit
       });
       res.send(datasets);
     } catch(err) {
@@ -202,9 +230,10 @@ module.exports = {
         file = fs.readFileSync(filePath).toString("binary");
         const image = sharp(filePath);
         let {width, height} = await image.metadata();
-        if (dataset.segments === false && height > 300) {
-          width = Math.ceil(width / height * 300);
-          height = 300;
+        const size = width * height, maxSize = config.dataset.imageMaxSize;
+        if (dataset.segments === false && size > maxSize) {
+          width = Math.ceil(width * Math.sqrt(maxSize / size));
+          height = Math.ceil(height * Math.sqrt(maxSize / size));
           const buffer = await image.resize(width, height).toBuffer();
           file = buffer.toString("binary");
         }
