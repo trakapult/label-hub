@@ -15,11 +15,11 @@ require("./passport");
 routes(app);
 
 sequelize.sync().then(() => {
-  app.listen(config.port, '0.0.0.0', () => {
-    console.log(`Server started on port ${config.port}`)
+  app.listen(config.port, "0.0.0.0", () => {
+    console.log(`Server started on port ${config.port}`);
   })
 }).catch((err) => {
-  console.error(err)
+  console.error(err);
 });
 
 const handleExpiredDatasets = require("./utils/handleExpiredDatasets");

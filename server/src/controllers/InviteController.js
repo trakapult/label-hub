@@ -1,4 +1,4 @@
-const { Invite, Dataset } = require('../models');
+const { Invite, Dataset } = require("../models");
 
 module.exports = {
   async create (req, res) {

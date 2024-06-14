@@ -9,36 +9,6 @@ const chunkSize = 2000;
 const progressLineWidth = 2;
 const fontSize = 12;
 
-async function drawWave(audio, wave, canvas) {
-  const ctx = wave.getContext("2d");
-  const {height} = wave;
-  const centerHeight = Math.ceil(height / 2);
-  const scaleFactor = height / 2;
-
-  const buffer = await fetch(`data:audio/wav;base64,${btoa(audio)}`).then((res) => res.arrayBuffer());
-  const audioBuffer = await new AudioContext().decodeAudioData(buffer);
-  const float32Array = audioBuffer.getChannelData(0);
-
-  const array = [];
-  for (let i = 0; i < float32Array.length; i += chunkSize) {
-    array.push(
-      float32Array.slice(i, i + chunkSize).reduce(function (total, value) {
-        return Math.max(total, Math.abs(value));
-      })
-    );
-  }
-  ctx.clearRect(0, 0, wave.width, wave.height);
-  wave.width = Math.ceil(float32Array.length / chunkSize + margin * 2);
-  canvas.width = wave.width;
-  for (let index in array) {
-    ctx.strokeStyle = "black";
-    ctx.beginPath();
-    ctx.moveTo(margin + Number(index), centerHeight - array[index] * scaleFactor);
-    ctx.lineTo(margin + Number(index), centerHeight + array[index] * scaleFactor);
-    ctx.stroke();
-  }
-}
-
 let doScroll = true;
 let mouseLeaveInterval = null;
 
@@ -77,15 +47,46 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
     return labelData;
   }
 
+  async function drawWave(audio) {
+    const wave = waveRef.current;
+    const ctx = wave.getContext("2d");
+    const {height} = wave;
+    const centerHeight = Math.ceil(height / 2);
+    const scaleFactor = height / 2;
+  
+    const buffer = await fetch(`data:audio/wav;base64,${btoa(audio)}`).then((res) => res.arrayBuffer());
+    const audioBuffer = await new AudioContext().decodeAudioData(buffer);
+    const float32Array = audioBuffer.getChannelData(0);
+  
+    const array = [];
+    for (let i = 0; i < float32Array.length; i += chunkSize) {
+      array.push(
+        float32Array.slice(i, i + chunkSize).reduce(function (total, value) {
+          return Math.max(total, Math.abs(value));
+        })
+      );
+    }
+    ctx.clearRect(0, 0, wave.width, wave.height);
+    const width = Math.ceil(float32Array.length / chunkSize + margin * 2);
+    waveRef.current.width = width;
+    canvasRef.current.width = width;
+    for (let index in array) {
+      ctx.strokeStyle = "black";
+      ctx.beginPath();
+      ctx.moveTo(margin + Number(index), centerHeight - array[index] * scaleFactor);
+      ctx.lineTo(margin + Number(index), centerHeight + array[index] * scaleFactor);
+      ctx.stroke();
+    }
+  }
+
   useEffect(() => {
-    drawWave(file, waveRef.current, canvasRef.current);
+    drawWave(file);
     setCanvas(canvasRef.current);
   }, [file]);
 
   useEffect(() => {
     const s = labelDataToSegments(curLabelData);
     setSegments(s);
-    fillSegments(s);
     setSaved(curLabelData ? true : false);
   }, [sampleId, fileInfo?.duration, curLabelData, canvas?.width]);
 
@@ -123,7 +124,7 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
   }
 
   const fillSegments = (s) => {
-    if (!canvas) return;
+    if (!canvas || !s) return;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     s.forEach((intv, index) => {
@@ -233,6 +234,7 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
               />
               <canvas
                 className="audio-canvas label-canvas"
+                id={`canvas ${sampleId}`}
                 ref={canvasRef}
                 height={canvasHeight}
                 onMouseDown={handleMouseDown}

@@ -74,7 +74,7 @@ function getAnswer(data, weights, dataset) {
         if (equal(a[j].value, uniq[i], threshold)) {
           a[j] = mergeSingle(a[j], uniq[i]);
           found = true;
-          tmpreak;
+          break;
         }
       }
       if (!found) a.push({value: uniq[i], weight: weights[idx], idx});
@@ -104,7 +104,10 @@ async function getDataAndWeights(labels, dataset) {
   const { User } = require("../models");
   const data = {}, weights = [];
   for (const label of labels) {
-    const labelData = JSON.parse(fs.readFileSync(`./data/labels/${label.datasetId}/${label.labeler}.json`));
+    const path = `./data/labels/${dataset.id}/${label.labeler}.json`;
+    let labelData = {};
+    if (fs.existsSync(path))
+      labelData = JSON.parse(fs.readFileSync(path));
     for (const sampleId in labelData) {
       if (!data[sampleId]) data[sampleId] = [];
       data[sampleId].push(labelData[sampleId]);
@@ -117,7 +120,6 @@ async function getDataAndWeights(labels, dataset) {
 }
 
 function getAcc(a, b, threshold = -1) {
-  console.log(a, b, threshold);
   if (threshold === -1) {
     return a == b ? 1 : 0;
   }
@@ -158,7 +160,10 @@ async function updateAccSum(labels, dataset) {
   const answer = getAnswer(data, weights, dataset);
   fs.writeFileSync(path, JSON.stringify(answer));
   for (const label of labels) {
-    const labelData = JSON.parse(fs.readFileSync(`${dirPath}/${label.labeler}.json`));
+    const path = `${dirPath}/${label.labeler}.json`;
+    let labelData = {};
+    if (fs.existsSync(path))
+      labelData = JSON.parse(fs.readFileSync(path));
     const accSum = getAccSum(answer, labelData, dataset);
     await label.update({accSum});
   }

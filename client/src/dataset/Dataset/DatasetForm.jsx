@@ -8,7 +8,7 @@ function DatasetForm ({dataset}) {
   const {state} = useAuthContext();
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const [labelInfoInput, setlabelInfoInput] = useState(null);
+  const [labelInfoInput, setLabelInfoInput] = useState(null);
 
   useEffect(() => {
     if (dataset) {
@@ -32,27 +32,27 @@ function DatasetForm ({dataset}) {
   const handleChange = (e) => {
     const labelType = e.target.value;
     if (labelType === "categorical") {
-      setlabelInfoInput(
+      setLabelInfoInput(
         <div className="input-group">
           <input
             className="form-control"
             type="text"
             id="categories"
             placeholder="类别1,类别2,...,类别n"
-            defaultValue={dataset?.labelInfo?.join(",")}
+            defaultValue={dataset.labelType === "categorical" ? dataset.labelInfo.join(",") : ""}
             required
           />
         </div>
       );
     } else if (labelType === "numerical") {
-      setlabelInfoInput(
+      setLabelInfoInput(
         <div className="input-group">
           <input
             className="form-control"
             type="number"
             id="min"
             placeholder="最小值"
-            defaultValue={dataset?.labelInfo?.min}
+            defaultValue={dataset.labelType === "numerical" ? dataset.labelInfo.min : ""}
             required
           />
           <input
@@ -60,13 +60,13 @@ function DatasetForm ({dataset}) {
             type="number" 
             id="max"
             placeholder="最大值"
-            defaultValue={dataset?.labelInfo?.max}
+            defaultValue={dataset.labelType === "numerical" ? dataset.labelInfo.max : ""}
             required
           />
         </div>
       );
     } else {
-      setlabelInfoInput(null);
+      setLabelInfoInput(null);
     }
   }
 
@@ -78,8 +78,8 @@ function DatasetForm ({dataset}) {
       const type = e.target.type.value;
       const dataType = e.target.dataType.value;
       const labelType = e.target.labelType.value;
-      const min = e.target.min?.value, max = e.target.max?.value;
-      const categories = e.target.categories?.value;
+      const min = e.target?.min?.value, max = e.target?.max?.value;
+      const categories = e.target?.categories?.value;
       let labelInfo = null;
       if (labelType === "numerical") {
         labelInfo = {min, max};

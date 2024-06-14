@@ -27,7 +27,7 @@ function Header() {
             <div className="navbar-nav">
               <a className="nav-link" href={`/user/${state.user.name}`}>{state.user.name}</a>
               <button className="nav-link" onClick={toggleInvites}>邀请箱</button>
-              <a className="nav-link" href="/" onClick={() => dispatch({type: "LOGOUT"})}>注销</a>
+              <a className="nav-link" href="/" onClick={() => dispatch({type: "LOGOUT"})}>退出</a>
             </div>
           )}
         </div>

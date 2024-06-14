@@ -1,4 +1,5 @@
-const { Label, Dataset } = require('../models');
+const { getAccSum } = require("../utils/validate");
+const { Label, Dataset } = require("../models");
 const fs = require("fs");
 
 module.exports = {
@@ -30,7 +31,8 @@ module.exports = {
         if (fs.existsSync(settingsPath)) {
           const answers = JSON.parse(fs.readFileSync(settingsPath)).answers;
           if (answers) {
-            label.accSum = Object.keys(labelData).filter((key) => answers[key] === labelData[key]).length;
+            //label.accSum = Object.keys(labelData).filter((key) => answers[key] === labelData[key]).length;
+            label.accSum = getAccSum(answers, labelData, dataset);
           }
         }
       }

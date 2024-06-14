@@ -1,10 +1,10 @@
-const passport = require('passport');
-const { User } = require('./models');
+const passport = require("passport");
+const { User } = require("./models");
 
-const JwtStrategy = require('passport-jwt').Strategy;
-const ExtractJwt = require('passport-jwt').ExtractJwt;
+const JwtStrategy = require("passport-jwt").Strategy;
+const ExtractJwt = require("passport-jwt").ExtractJwt;
 
-const config = require('./config');
+const config = require("./config");
 
 passport.use(
   new JwtStrategy({
@@ -22,6 +22,6 @@ passport.use(
       return done(new Error(), false);
     }
   })
-)
+);
 
 module.exports = null;

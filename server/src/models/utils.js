@@ -38,15 +38,12 @@ const validate = (label, dataset) => {
   if (!fs.existsSync(settingsPath))
     return true;
   const answers = JSON.parse(fs.readFileSync(settingsPath)).answers;
-  console.log("验证标注", label.id, answers);
   if (!answers) return true;
   const labelPath = `./data/labels/${dataset.id}/${label.labeler}.json`;
   assert(fs.existsSync(labelPath), `Label file ${labelPath} does not exist`);
   const labelData = JSON.parse(fs.readFileSync(labelPath));
-  console.log("labelData", labelData);
   const { getAccSum } = require("../utils/validate");
   const accSum = getAccSum(answers, labelData, dataset);
-  console.log("accSum", accSum, Object.keys(answers).length * config.rewardSystem.accRatio);
   return accSum >= Object.keys(answers).length * config.rewardSystem.accRatio;
 }
 

@@ -18,7 +18,6 @@ module.exports = {
       deadline: Joi.date().required()
     });
     let {error} = schema.validate(req.body);
-    console.log("期限：", new Date(req.body.deadline), new Date());
     if (!error && req.body.labelType === "numerical") {
       const {min, max} = JSON.parse(req.body.labelInfo);
       if (min > max) {

@@ -45,7 +45,6 @@ function ImageSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
   useEffect(() => {
     const a = labelDataToAreas(curLabelData);
     setAreas(a);
-    fillAreas(a);
     setSaved(curLabelData ? true : false);
   }, [sampleId, fileInfo?.width, fileInfo?.height, curLabelData]);
 

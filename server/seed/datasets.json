@@ -83,5 +83,16 @@
     "labelType": "categorical",
     "labelInfo": ["1", "2", "3"],
     "segments": false
+  },
+  {
+    "name": "Directory",
+    "admin": "FirstUser",
+    "description": "文件结构测试",
+    "sampleNum": 17,
+    "type": "private",
+    "dataType": "text",
+    "labelType": "categorical",
+    "labelInfo": ["One", "Two", "Three"],
+    "segments": false
   }
 ]
