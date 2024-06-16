@@ -7,7 +7,7 @@ import SaveButton from "./SaveButton";
 
 const height = 300;
 
-function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabel, saveLabel}) {
+function NoSegLabeling ({sampleId, file, dataType, labelType, labelInfo, curLabel, saveLabel}) {
   const [textualLabel, setTextualLabel] = useState("");
   const [saved, setSaved] = useState(false);
 
@@ -71,4 +71,4 @@ function LabelingPanel ({sampleId, file, dataType, labelType, labelInfo, curLabe
   );
 }
 
-export default LabelingPanel;
+export default NoSegLabeling;

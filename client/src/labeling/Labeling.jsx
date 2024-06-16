@@ -4,7 +4,7 @@ import { useAuthContext } from "@/context/AuthContext";
 import View from "@/view/View";
 import Error from "@/common/Error";
 import Timer from "@/common/Timer";
-import LabelingPanel from "./LabelingPanel";
+import NoSegLabeling from "./NoSegLabeling";
 import SegLabeling from "./SegLabeling";
 import DatasetService from "@/dataset/DatasetService";
 import LabelService from "./LabelService";
@@ -112,7 +112,7 @@ function Labeling () {
     const handleSampleLoad = ({file, fileInfo}) => {
       return (
         <>
-          {!segments && <LabelingPanel
+          {!segments && <NoSegLabeling
             sampleId={sampleId}
             file={file}
             dataType={dataset.dataType}

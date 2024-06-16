@@ -6,30 +6,11 @@ import TextualLabels from "./Labels/TextualLabels";
 const height = 500;
 const colors = ["blue", "coral", "green", "salmon", "seagreen", "steelblue"];
 
-/*
-const hashMap = {}, hashMapLim = 20;
-function getHash(label) {
-  if (!label) return 0;
-  if (hashMap[label] === undefined) {
-    let len = Object.keys(hashMap).length;
-    if (len >= hashMapLim)
-      return label.charCodeAt(label.length - 1) % (colors.length - 1) + 1;
-    hashMap[label] = len;
-  }
-  return hashMap[label] % (colors.length - 1) + 1;
-}
-
-function getColor(label, light=false) {
-  const hash = getHash(label);
-  return (light ? "light" : "") + colors[hash];
-}
-*/
-
 function getColor(index, light=false) {
   return (light ? "light" : "") + colors[index % colors.length];
 }
 
-function LabelingPanel({data, attrs, rows, labelType, labelInfo, saveLabel, curLabelData}) {
+function SegLabelingPanel({data, attrs, rows, labelType, labelInfo, saveLabel, curLabelData}) {
   const getLabels = (index) => {
     if (labelType === "numerical" && labelInfo.max - labelInfo.min <= 10) {
       return (
@@ -99,5 +80,5 @@ function LabelingPanel({data, attrs, rows, labelType, labelInfo, saveLabel, curL
   )
 }
 
-export default LabelingPanel;
+export default SegLabelingPanel;
 export { getColor };

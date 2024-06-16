@@ -6,13 +6,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       validate: {
         startsWith: (value) => {
-          if (value === "upload" || value === "labelGet" || value === "correctGet" || value === "inviteGet") {
-            return;
-          }
-          if (value.startsWith("labelPay ") || value.startsWith("correctPay ") || value.startsWith("invitePay ")) {
-            return;
-          }
-          throw new Error(`Invalid reason: ${value}`);
+          const prefices = ["upload", "labelGet", "correctGet", "inviteGet", "labelPay", "correctPay", "invitePay"];
+          if (!prefices.some((prefix) => value.startsWith(prefix)))
+            throw new Error(`Invalid reason: ${value}`);
         }
       }
     },
@@ -31,11 +27,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "user",
       onDelete: "CASCADE"
     });
-    Points.belongsTo(models.Dataset, {
-      foreignKey: "datasetId",
-      as: "dataset",
-      onDelete: "CASCADE"
-    });
   };
   Points.afterSave(async (points) => {
     const { User } = points.sequelize.models;
@@ -44,6 +35,7 @@ module.exports = (sequelize, DataTypes) => {
     await user.update({points: Math.max(0, user.points + pointsChange)});
   });
   Points.afterDestroy(async (points) => {
+    console.log("afterDestroy", points);
     const { User } = points.sequelize.models;
     const user = await User.findOne({where: {name: points.receiver}});
     await user.update({points: Math.max(0, user.points - points.amount)});

@@ -8,6 +8,11 @@ const {
 
 module.exports = (sequelize, DataTypes) => {
   const Label = sequelize.define("Label", {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true
+    },
     datasetId: DataTypes.INTEGER,
     labeler: DataTypes.STRING,
     labeledNum: {
@@ -65,20 +70,6 @@ module.exports = (sequelize, DataTypes) => {
     if (label.validated) {
       await settleLabelPayment(label, dataset);
     } else {
-      await retrieveLabelPayment(label, dataset);
-    }
-  });
-  Label.afterDestroy(async (label) => {
-    const { Dataset } = label.sequelize.models;
-    const dataset = await Dataset.findByPk(label.datasetId);
-    const count = await Label.count({where: {
-      datasetId: label.datasetId,
-      validated: true
-    }});
-    if (count === 0) {
-      await retrieveUploadReward(dataset);
-    }
-    if (dataset.type !== "entertain") {
       await retrieveLabelPayment(label, dataset);
     }
   });

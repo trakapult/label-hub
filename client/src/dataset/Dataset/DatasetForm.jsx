@@ -24,6 +24,7 @@ function DatasetForm ({dataset}) {
       document.getElementsByClassName("buttons")[0].innerHTML = `
         <button class="btn btn-primary" type="submit">保存</button>
         <a class="btn btn-primary" href="/dataset/${dataset.id}">取消</a>
+        <div class="form-text text-center mb-3">修改信息后会清除原有标注与上传奖励</div>
       `;
       handleChange({target: {value: dataset.labelType}});
     }

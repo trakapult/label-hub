@@ -56,7 +56,7 @@ module.exports = {
         res.status(403).send({error: "您无权撤回此邀请"});
         return;
       }
-      await Invite.destroy({where: {datasetId, receiver}});
+      await Invite.destroy({where: {datasetId, receiver}, individualHooks: true});
       res.send({message: "邀请已撤回"});
     } catch(err) {
       console.error(err);

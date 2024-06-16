@@ -1,3 +1,4 @@
+const fs = require("fs");
 const config = require("../config");
 
 module.exports = (sequelize, DataTypes) => {
@@ -45,11 +46,6 @@ module.exports = (sequelize, DataTypes) => {
       as: "labels",
       onDelete: "CASCADE",
     });
-    Dataset.hasMany(models.Points, {
-      foreignKey: "datasetId",
-      as: "points",
-      onDelete: "CASCADE",
-    });
   };
   Dataset.beforeSave((dataset) => {
     if (!dataset.reward) {
@@ -65,23 +61,19 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   Dataset.afterUpdate(async (dataset) => {
-    const { Points } = dataset.sequelize.models;
-    const points = await Points.findOne({where: {
-      receiver: dataset.admin,
-      datasetId: dataset.id,
-      reason: "upload"
-    }});
-    if (points) {
-      await points.update({amount: config.rewardSystem.uploadReward[dataset.type] * dataset.sampleNum});
+    const { Label, Points } = dataset.sequelize.models;
+    await Points.destroy({where: {datasetId: dataset.id, receiver: dataset.admin, reason: "upload"}, individualHooks: true});
+    const labels = await Label.findAll({where: {datasetId: dataset.id}});
+    for (const label of labels) {
+      const path = `./data/labels/${label.id}`;
+      if (fs.existsSync(path))
+        fs.rmSync(path, {recursive: true});
     }
+    await Label.destroy({where: {datasetId: dataset.id}, individualHooks: true});
   });
   Dataset.afterDestroy(async (dataset) => {
     const { Points } = dataset.sequelize.models;
-    await Points.destroy({where: {
-      receiver: dataset.admin,
-      datasetId: dataset.id,
-      reason: "upload"
-    }});
+    await Points.destroy({where: {datasetId: dataset.id, receiver: dataset.admin, reason: "upload"}, individualHooks: true});
   });
   return Dataset;
 };

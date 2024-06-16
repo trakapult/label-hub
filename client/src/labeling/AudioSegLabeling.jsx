@@ -201,7 +201,7 @@ function AudioSegLabeling({sampleId, file, fileInfo, labelType, labelInfo, curLa
 
   const saveLabel = (index) => (value) => {
     const newSegments = [...segments];
-    newSegments[index].label = value;
+    newSegments[index].label = value || null;
     setSegments(newSegments);
     setSaved(false);
   };

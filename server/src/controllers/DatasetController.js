@@ -73,7 +73,7 @@ const extractZip = (path) => {
 
 const removeFiles = (path) => {
   if (fs.existsSync(path))
-    fs.rmdirSync(path, {recursive: true});
+    fs.rmSync(path, {recursive: true});
   if (fs.existsSync(path + ".zip"))
     fs.rmSync(path + ".zip");
   if (fs.existsSync(`${path}_names.json`))
@@ -125,6 +125,7 @@ module.exports = {
       if (file) {
         const zipFile = new admZip(fs.readFileSync(file.path));
         sampleNum = zipFile.getEntries().filter((zipEntry) => isValid(zipEntry.entryName, dataType)).length;
+        dataset.changed("sampleNum", true);
       }
       let labelInfoParsed = null;
       if (labelType === "numerical" || labelType === "categorical") {

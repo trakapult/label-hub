@@ -30,6 +30,7 @@ function DeleteDataset ({dataset}) {
           <h5>请键入数据集名称并点击“确认删除”</h5>
           <input  className="form-control mt-3" type="text" id="name" placeholder={dataset.name} />
           <button className="btn btn-danger mt-3">确认删除</button>
+          <div className="form-text text-center">删除后会清除标注与上传奖励</div>
         </form>
       )}
       {(!sameUser || error) && (

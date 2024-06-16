@@ -1,16 +1,17 @@
 function NumericalLabels ({labelInfo, curLabel, saveLabel, formtext=true}) {
+  const min = parseInt(labelInfo.min), max = parseInt(labelInfo.max);
   return (
     <div className="text-center">
       <div className="d-flex justify-content-center gap-2" onClick={(e) => saveLabel(e.target.value)}>
-        {Array.from({length: labelInfo.max - labelInfo.min + 1}, (_, index) => (
+        {Array.from({length: max - min + 1}, (_, index) => (
           <button
-            className={"btn rounded-circle " + (labelInfo.min + index === parseInt(curLabel) ? "btn-success" : "btn-primary")}
+            className={"btn rounded-circle " + (min + index === parseInt(curLabel) ? "btn-success" : "btn-primary")}
             type="button"
-            value={labelInfo.min + index}
-            id={`button${labelInfo.min + index}`}
+            value={min + index}
+            id={`button${min + index}`}
             key={index}
           >
-            {labelInfo.min + index}
+            {min + index}
           </button>
         ))}
       </div>
